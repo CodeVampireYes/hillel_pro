@@ -7,6 +7,7 @@ from my_calendar import together_list, together_weekend
 together_weekend()
 async def inline_game():
     keyboard = InlineKeyboardBuilder()
+    keyboard.add(InlineKeyboardButton(text='WOT', callback_data='run_wot'))
     for game in game_id:
         game_name = game[0]
         id_game = game[1]

@@ -27,13 +27,21 @@ dp = Dispatcher()
 
 
 # Функция обработки нажатий кнопок
-def btn_click(value: str):
+def run_game_steam(value: str):
     print(value[3:])
     if DISCORD_ON == False:
         os.system(f'start steam://run/{value[3:]}')
     else:
         os.system(discord_link)
         os.system(f'start steam://run/{value[3:]}')
+
+
+def run_game_wot():
+    if DISCORD_ON == False:
+        os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
+    else:
+        os.system(discord_link)
+        os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
 
 
 def toggle_discord(values):
@@ -66,7 +74,7 @@ async def tog_week(message: Message):
 @dp.callback_query(F.data.startswith('id_'))  # Фильтруем все callback_data
 async def process_callback(callback_query: CallbackQuery):
     callback_data = callback_query.data  # Получаем callback_data
-    btn_click(callback_data)  # Вызываем функцию с этим значением
+    run_game_steam(callback_data)  # Вызываем функцию с этим значением
     # Обязательно отправляем ответ, иначе кнопка зависнет
     await callback_query.answer(f"Вы нажали: {callback_data}")
 
@@ -83,6 +91,13 @@ async def process_discord_callback(callback_query: CallbackQuery):
     callback_data = callback_query.data
     toggle_discord(callback_data)
     await callback_query.answer(f"Вы нажали: {callback_data}")
+
+
+@dp.callback_query(F.data == 'run_wot')
+async def game_wot(callback_query: CallbackQuery):
+    callback_data = callback_query.data
+    run_game_wot()
+    await callback_query.answer('Wot запущен')
 
 
 # Запуск бота
