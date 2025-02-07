@@ -1,13 +1,23 @@
 import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, BotCommand
 
-from config import TOKEN
+from config import TOKEN, DISCORD_ON, discord_link
 import keyboards as kb  # Импортируем клавиатуры
 
 import os
 
+
+# Список команд с описаниями
+commands = [
+    BotCommand(command="go", description="Запустить игру"),
+    BotCommand(command="discord", description="Настройка запуска Discord"),
+]
+
+# Функция для установки команд
+async def set_commands(bot: Bot):
+    await bot.set_my_commands(commands)
 
 # Создаем бота и диспетчер
 bot = Bot(TOKEN)
@@ -17,13 +27,33 @@ dp = Dispatcher()
 # Функция обработки нажатий кнопок
 def btn_click(value: str):
     print(value[3:])
-    os.system(f'start steam://run/{value[3:]}')
+    if DISCORD_ON == False:
+        os.system(f'start steam://run/{value[3:]}')
+    else:
+        os.system(discord_link)
+        os.system(f'start steam://run/{value[3:]}')
 
+
+def toggle_discord(values):
+    global DISCORD_ON
+    if values == 'discord_on':
+        DISCORD_ON = True
+        print(DISCORD_ON)
+        return DISCORD_ON
+    else:
+        DISCORD_ON = False
+        print(DISCORD_ON)
+        return DISCORD_ON
 
 # Обработчик команды /go
 @dp.message(Command("go"))
 async def start_command(message: Message):
     await message.reply(text="Какую игру запустить", reply_markup=await kb.inline_game())
+
+
+@dp.message(Command('discord'))
+async def on_discord(message: Message):
+    await message.reply(text='Запускать с игрой дискорд?', reply_markup=await kb.inline_discord())
 
 
 @dp.callback_query(F.data.startswith('id_'))  # Фильтруем все callback_data
@@ -34,8 +64,23 @@ async def process_callback(callback_query: CallbackQuery):
     await callback_query.answer(f"Вы нажали: {callback_data}")
 
 
+@dp.callback_query(F.data =='discord_on')
+async def process_discord_callback(callback_query: CallbackQuery):
+    callback_data = callback_query.data
+    toggle_discord(callback_data)
+    await callback_query.answer(f"Вы нажали: {callback_data}")
+
+
+@dp.callback_query(F.data =='discord_off')
+async def process_discord_callback(callback_query: CallbackQuery):
+    callback_data = callback_query.data
+    toggle_discord(callback_data)
+    await callback_query.answer(f"Вы нажали: {callback_data}")
+
+
 # Запуск бота
 async def main():
+    await set_commands(bot)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

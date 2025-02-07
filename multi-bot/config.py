@@ -4,4 +4,6 @@ game_id = [['Counter-Strike 2', '730'],
            ['Dota 2', '570'],
            ['PUBG: BATTLEGROUNDS', '578080']
            ]
+DISCORD_ON = True
 
+discord_link = r'C:\Users\ar2rf\AppData\Local\Discord\Update.exe --processStart Discord.exe'
