@@ -5,6 +5,7 @@ from aiogram.types import Message, CallbackQuery, BotCommand
 
 from config import TOKEN, DISCORD_ON, discord_link
 import keyboards as kb  # Импортируем клавиатуры
+from my_calendar import together_weekend
 
 import os
 
@@ -13,6 +14,7 @@ import os
 commands = [
     BotCommand(command="go", description="Запустить игру"),
     BotCommand(command="discord", description="Настройка запуска Discord"),
+    BotCommand(command="tog", description="Показать выходные")
 ]
 
 # Функция для установки команд
@@ -45,6 +47,7 @@ def toggle_discord(values):
         print(DISCORD_ON)
         return DISCORD_ON
 
+
 # Обработчик команды /go
 @dp.message(Command("go"))
 async def start_command(message: Message):
@@ -55,6 +58,10 @@ async def start_command(message: Message):
 async def on_discord(message: Message):
     await message.reply(text='Запускать с игрой дискорд?', reply_markup=await kb.inline_discord())
 
+
+@dp.message(Command('tog'))
+async def tog_week(message: Message):
+    await message.reply(text="Следующие выходные вместе:", reply_markup=await kb.together_week())
 
 @dp.callback_query(F.data.startswith('id_'))  # Фильтруем все callback_data
 async def process_callback(callback_query: CallbackQuery):

@@ -1,8 +1,10 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 from config import game_id
+from my_calendar import together_list, together_weekend
 
-
+together_weekend()
 async def inline_game():
     keyboard = InlineKeyboardBuilder()
     for game in game_id:
@@ -16,4 +18,15 @@ async def inline_discord():
     keyboard = InlineKeyboardBuilder()
     keyboard.add(InlineKeyboardButton(text='On', callback_data='discord_on'),
                  (InlineKeyboardButton(text='Off', callback_data='discord_off')))
+    return keyboard.adjust(1).as_markup()
+
+
+async def together_week():
+    keyboard = InlineKeyboardBuilder()
+    i = 0
+    for week in together_list:
+        keyboard.add(InlineKeyboardButton(text=week, callback_data='together'))
+        i += 1
+        if i == 10:
+            break
     return keyboard.adjust(1).as_markup()
