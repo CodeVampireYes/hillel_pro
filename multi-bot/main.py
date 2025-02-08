@@ -30,7 +30,6 @@ dp = Dispatcher()
 
 # Функция запуска игр стим и дискорда
 def run_game_steam(value: str):
-    print(value[3:])
     if DISCORD_ON == False:
         os.system(f'start steam://run/{value[3:]}')
     else:
@@ -53,11 +52,9 @@ def toggle_discord(values):
     global DISCORD_ON
     if values == 'discord_on':
         DISCORD_ON = True
-        print(DISCORD_ON)
         return DISCORD_ON
     else:
         DISCORD_ON = False
-        print(DISCORD_ON)
         return DISCORD_ON
 
 @dp.message(Command('myid'))
