@@ -30,6 +30,7 @@ dp = Dispatcher()
 
 # Функция запуска игр стим и дискорда
 def run_game_steam(value: str):
+    global DISCORD_ON
     if DISCORD_ON == False:
         os.system(f'start steam://run/{value[3:]}')
     else:
@@ -40,6 +41,7 @@ def run_game_steam(value: str):
 # Функция запуска wot и дискорда
 ## улучшить для всех декстоп приложений ##
 def run_game_wot():
+    global DISCORD_ON
     if DISCORD_ON == False:
         os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
     else:
@@ -49,6 +51,7 @@ def run_game_wot():
 
 # Функция переключения состояния запуска дискорд
 def toggle_discord(values):
+    global DISCORD_ON
     if values == 'discord_on':
         DISCORD_ON = True
         return DISCORD_ON
