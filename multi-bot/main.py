@@ -60,6 +60,10 @@ def toggle_discord(values):
         return DISCORD_ON
 
 
+async def next_kb(message: Message):
+    await message.answer(text="Какую игру запустить", reply_markup=await kb.inline_game())
+
+
 @dp.message(Command('myid'))
 async def get_my_id(message: Message):
     await message.answer(f'{message.from_user.id}')
@@ -122,6 +126,7 @@ async def process_discord_callback(callback_query: CallbackQuery):
 
     toggle_discord(callback_data)
     await callback_query.answer(f"Вы нажали: {callback_data}")
+    await next_kb(callback_query.message)
 
 
 # Ожидание колбэка discord_off
@@ -136,6 +141,7 @@ async def process_discord_callback(callback_query: CallbackQuery):
 
     toggle_discord(callback_data)
     await callback_query.answer(f"Вы нажали: {callback_data}")
+    await next_kb(callback_query.message)
 
 
 # Ожидание колбэка run_wot
