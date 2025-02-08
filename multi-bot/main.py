@@ -59,6 +59,8 @@ def toggle_discord(values):
 @dp.message(Command('myid'))
 async def get_my_id(message: Message):
     await message.answer(f'{message.from_user.id}')
+    await message.delete()
+
 
 
 # Обработчик команды /go
@@ -66,23 +68,28 @@ async def get_my_id(message: Message):
 async def start_command(message: Message):
     if message.from_user.id == MY_ID:
         await message.reply(text="Какую игру запустить", reply_markup=await kb.inline_game())
+        await message.delete()
     else:
         await message.answer(f'Для вас {message.from_user.first_name} доступна только команда /tog')
+        await message.delete()
 
 
-# Обработчик команды /discord
+    # Обработчик команды /discord
 @dp.message(Command('discord'))
 async def on_discord(message: Message):
     if message.from_user.id == MY_ID:
         await message.reply(text='Запускать с игрой дискорд?', reply_markup=await kb.inline_discord())
+        await message.delete()
     else:
         await message.answer(f'Для вас {message.from_user.first_name} доступна только команда /tog')
+        await message.delete()
 
 
-# Обработчик команды /tog
+    # Обработчик команды /tog
 @dp.message(Command('tog'))
 async def tog_week(message: Message):
     await message.reply(text="Следующие 10 выходных вместе:", reply_markup=await kb.together_week())
+    await message.delete()
 
 
 # Ожидание колбэка который начинается на id_
