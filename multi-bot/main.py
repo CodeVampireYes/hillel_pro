@@ -5,7 +5,6 @@ from aiogram.types import Message, CallbackQuery, BotCommand
 
 from config import TOKEN, DISCORD_ON, discord_link, MY_ID
 import keyboards as kb  # Импортируем клавиатуры
-from my_calendar import together_weekend
 
 import os
 
@@ -56,6 +55,7 @@ def toggle_discord(values):
     else:
         DISCORD_ON = False
         return DISCORD_ON
+
 
 @dp.message(Command('myid'))
 async def get_my_id(message: Message):
