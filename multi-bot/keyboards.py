@@ -4,7 +4,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import game_id
 from my_calendar import together_list, together_weekend
 
-together_weekend()
+together_weekend() # высчитывает вместе выходные после старта программы
+
+
 async def inline_game():
     keyboard = InlineKeyboardBuilder()
     keyboard.add(InlineKeyboardButton(text='WOT', callback_data='run_wot'))
