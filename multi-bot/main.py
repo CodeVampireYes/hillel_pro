@@ -22,12 +22,13 @@ commands = [
 async def set_commands(bot: Bot):
     await bot.set_my_commands(commands)
 
+
 # Создаем бота и диспетчер
 bot = Bot(TOKEN)
 dp = Dispatcher()
 
 
-# Функция обработки нажатий кнопок
+# Функция запуска игр стим и дискорда
 def run_game_steam(value: str):
     print(value[3:])
     if DISCORD_ON == False:
@@ -37,6 +38,7 @@ def run_game_steam(value: str):
         os.system(f'start steam://run/{value[3:]}')
 
 
+# Функция запуска игр декстоп и дискорда
 def run_game_wot():
     if DISCORD_ON == False:
         os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
@@ -45,6 +47,7 @@ def run_game_wot():
         os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
 
 
+# Функция переключения состояния запуска дискорд
 def toggle_discord(values):
     global DISCORD_ON
     if values == 'discord_on':
@@ -63,16 +66,19 @@ async def start_command(message: Message):
     await message.reply(text="Какую игру запустить", reply_markup=await kb.inline_game())
 
 
+# Обработчик команды /discord
 @dp.message(Command('discord'))
 async def on_discord(message: Message):
     await message.reply(text='Запускать с игрой дискорд?', reply_markup=await kb.inline_discord())
 
 
+# Обработчик команды /tog
 @dp.message(Command('tog'))
 async def tog_week(message: Message):
     await message.reply(text="Следующие 10 выходных вместе:", reply_markup=await kb.together_week())
 
 
+# Ожидание колбэка который начинается на id_
 @dp.callback_query(F.data.startswith('id_'))  # Фильтруем все callback_data
 async def process_callback(callback_query: CallbackQuery):
     callback_data = callback_query.data  # Получаем callback_data
@@ -81,6 +87,7 @@ async def process_callback(callback_query: CallbackQuery):
     await callback_query.answer(f"Вы нажали: {callback_data}")
 
 
+# Ожидание колбэка discord_on
 @dp.callback_query(F.data =='discord_on')
 async def process_discord_callback(callback_query: CallbackQuery):
     callback_data = callback_query.data
@@ -88,6 +95,7 @@ async def process_discord_callback(callback_query: CallbackQuery):
     await callback_query.answer(f"Вы нажали: {callback_data}")
 
 
+# Ожидание колбэка discord_off
 @dp.callback_query(F.data =='discord_off')
 async def process_discord_callback(callback_query: CallbackQuery):
     callback_data = callback_query.data
@@ -95,6 +103,7 @@ async def process_discord_callback(callback_query: CallbackQuery):
     await callback_query.answer(f"Вы нажали: {callback_data}")
 
 
+# Ожидание колбэка run_wot
 @dp.callback_query(F.data == 'run_wot')
 async def game_wot(callback_query: CallbackQuery):
     callback_data = callback_query.data
