@@ -38,7 +38,8 @@ def run_game_steam(value: str):
         os.system(f'start steam://run/{value[3:]}')
 
 
-# Функция запуска игр декстоп и дискорда
+# Функция запуска wot и дискорда
+## улучшить для всех декстоп приложений ##
 def run_game_wot():
     if DISCORD_ON == False:
         os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
