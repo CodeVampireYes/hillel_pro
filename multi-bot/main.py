@@ -11,9 +11,10 @@ import os
 
 # Список команд с описаниями
 commands = [
+    BotCommand(command="tog", description="Показать выходные"),
     BotCommand(command="go", description="Запустить игру"),
     BotCommand(command="discord", description="Настройка запуска Discord"),
-    BotCommand(command="tog", description="Показать выходные")
+    BotCommand(command="myid", description="Мой id")
 ]
 
 
@@ -60,7 +61,6 @@ def toggle_discord(values):
 async def get_my_id(message: Message):
     await message.answer(f'{message.from_user.id}')
     await message.delete()
-
 
 
 # Обработчик команды /go
