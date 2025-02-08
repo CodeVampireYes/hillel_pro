@@ -48,7 +48,6 @@ def run_game_wot():
 
 # Функция переключения состояния запуска дискорд
 def toggle_discord(values):
-    global DISCORD_ON
     if values == 'discord_on':
         DISCORD_ON = True
         return DISCORD_ON
@@ -90,6 +89,12 @@ async def tog_week(message: Message):
 @dp.callback_query(F.data.startswith('id_'))  # Фильтруем все callback_data
 async def process_callback(callback_query: CallbackQuery):
     callback_data = callback_query.data  # Получаем callback_data
+
+    # Удаляем сообщение с кнопками
+    chat_id = callback_query.message.chat.id
+    message_id = callback_query.message.message_id
+    await bot.delete_message(chat_id, message_id)
+
     run_game_steam(callback_data)  # Вызываем функцию с этим значением
     # Обязательно отправляем ответ, иначе кнопка зависнет
     await callback_query.answer(f"Вы нажали: {callback_data}")
@@ -99,6 +104,12 @@ async def process_callback(callback_query: CallbackQuery):
 @dp.callback_query(F.data =='discord_on')
 async def process_discord_callback(callback_query: CallbackQuery):
     callback_data = callback_query.data
+
+    # Удаляем сообщение с кнопками
+    chat_id = callback_query.message.chat.id
+    message_id = callback_query.message.message_id
+    await bot.delete_message(chat_id, message_id)
+
     toggle_discord(callback_data)
     await callback_query.answer(f"Вы нажали: {callback_data}")
 
@@ -107,6 +118,12 @@ async def process_discord_callback(callback_query: CallbackQuery):
 @dp.callback_query(F.data =='discord_off')
 async def process_discord_callback(callback_query: CallbackQuery):
     callback_data = callback_query.data
+
+    # Удаляем сообщение с кнопками
+    chat_id = callback_query.message.chat.id
+    message_id = callback_query.message.message_id
+    await bot.delete_message(chat_id, message_id)
+
     toggle_discord(callback_data)
     await callback_query.answer(f"Вы нажали: {callback_data}")
 
@@ -115,6 +132,12 @@ async def process_discord_callback(callback_query: CallbackQuery):
 @dp.callback_query(F.data == 'run_wot')
 async def game_wot(callback_query: CallbackQuery):
     callback_data = callback_query.data
+
+    # Удаляем сообщение с кнопками
+    chat_id = callback_query.message.chat.id
+    message_id = callback_query.message.message_id
+    await bot.delete_message(chat_id, message_id)
+
     run_game_wot()
     await callback_query.answer('Wot запущен')
 
