@@ -17,6 +17,7 @@ commands = [
     BotCommand(command="tog", description="Показать выходные")
 ]
 
+
 # Функция для установки команд
 async def set_commands(bot: Bot):
     await bot.set_my_commands(commands)
@@ -69,7 +70,8 @@ async def on_discord(message: Message):
 
 @dp.message(Command('tog'))
 async def tog_week(message: Message):
-    await message.reply(text="Следующие выходные вместе:", reply_markup=await kb.together_week())
+    await message.reply(text="Следующие 10 выходных вместе:", reply_markup=await kb.together_week())
+
 
 @dp.callback_query(F.data.startswith('id_'))  # Фильтруем все callback_data
 async def process_callback(callback_query: CallbackQuery):
