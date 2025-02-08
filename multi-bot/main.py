@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, BotCommand
 
-from config import TOKEN, DISCORD_ON, discord_link
+from config import TOKEN, DISCORD_ON, discord_link, MY_ID
 import keyboards as kb  # Импортируем клавиатуры
 from my_calendar import together_weekend
 
@@ -60,17 +60,27 @@ def toggle_discord(values):
         print(DISCORD_ON)
         return DISCORD_ON
 
+@dp.message(Command('myid'))
+async def get_my_id(message: Message):
+    await message.answer(f'{message.from_user.id}')
+
 
 # Обработчик команды /go
 @dp.message(Command("go"))
 async def start_command(message: Message):
-    await message.reply(text="Какую игру запустить", reply_markup=await kb.inline_game())
+    if message.from_user.id == MY_ID:
+        await message.reply(text="Какую игру запустить", reply_markup=await kb.inline_game())
+    else:
+        await message.answer(f'Для вас {message.from_user.first_name} доступна только команда /tog')
 
 
 # Обработчик команды /discord
 @dp.message(Command('discord'))
 async def on_discord(message: Message):
-    await message.reply(text='Запускать с игрой дискорд?', reply_markup=await kb.inline_discord())
+    if message.from_user.id == MY_ID:
+        await message.reply(text='Запускать с игрой дискорд?', reply_markup=await kb.inline_discord())
+    else:
+        await message.answer(f'Для вас {message.from_user.first_name} доступна только команда /tog')
 
 
 # Обработчик команды /tog

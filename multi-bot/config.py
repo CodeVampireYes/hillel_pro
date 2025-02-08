@@ -7,3 +7,5 @@ game_id = [['Counter-Strike 2', '730'],
 DISCORD_ON = True
 
 discord_link = r'C:\Users\ar2rf\AppData\Local\Discord\Update.exe --processStart Discord.exe'
+
+MY_ID = 5409293287
