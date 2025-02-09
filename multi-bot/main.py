@@ -102,7 +102,7 @@ async def on_discord(message: Message):
 @dp.message(Command('week'))
 async def my_week(message: Message):
     await message.reply(text='Выходные:', reply_markup=await kb.my_week())
-
+    await message.delete()
 
 # Ожидание колбэка который начинается на id_
 @dp.callback_query(F.data.startswith('id_'))  # Фильтруем все callback_data
@@ -195,6 +195,10 @@ async def press_month(callback_query: CallbackQuery):
 
     # Подтверждаем обработку callback
     await callback_query.answer()
+    # Удаляем сообщение с кнопками
+    chat_id = callback_query.message.chat.id
+    message_id = callback_query.message.message_id
+    await bot.delete_message(chat_id, message_id)
 
 
 

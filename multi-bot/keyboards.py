@@ -39,4 +39,4 @@ async def year_month():
     for month in year:
         keyboard.add(InlineKeyboardButton(text=month, callback_data=f'month{x}'))
         x +=1
-    return keyboard.adjust(1).as_markup()
+    return keyboard.adjust(2).as_markup()
