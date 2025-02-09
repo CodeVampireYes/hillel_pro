@@ -1,20 +1,27 @@
 import asyncio
+from io import BytesIO
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery, BotCommand
+from aiogram.types import Message, CallbackQuery, BotCommand, FSInputFile, InputFile
+import logging
 
-from config import TOKEN, DISCORD_ON, discord_link, MY_ID
+from my_config import TOKEN, DISCORD_ON, discord_link, MY_ID
 import keyboards as kb  # Импортируем клавиатуры
+from calendar_png import generate_calendar
 
 import os
+import time
 
+logging.basicConfig(level=logging.INFO)
 
 # Список команд с описаниями
 commands = [
+    BotCommand(command="week", description="Weekend"),
     BotCommand(command="tog", description="Показать выходные"),
     BotCommand(command="go", description="Запустить игру"),
     BotCommand(command="discord", description="Настройка запуска Discord"),
-    BotCommand(command="myid", description="Мой id")
+    BotCommand(command="myid", description="Мой id"),
+
 ]
 
 
@@ -92,11 +99,9 @@ async def on_discord(message: Message):
         await message.delete()
 
 
-    # Обработчик команды /tog
-@dp.message(Command('tog'))
-async def tog_week(message: Message):
-    await message.reply(text="Следующие 10 выходных вместе:", reply_markup=await kb.together_week())
-    await message.delete()
+@dp.message(Command('week'))
+async def my_week(message: Message):
+    await message.reply(text='Выходные:', reply_markup=await kb.my_week())
 
 
 # Ожидание колбэка который начинается на id_
@@ -156,6 +161,41 @@ async def game_wot(callback_query: CallbackQuery):
 
     run_game_wot()
     await callback_query.answer('Wot запущен')
+
+
+@dp.callback_query(F.data == 'week_artur')
+async def watch_week_artur(callback_query: CallbackQuery):
+    callback_data = callback_query.data
+
+    keyboard = await kb.year_month()
+    await callback_query.message.edit_reply_markup(reply_markup=keyboard)
+
+    await callback_query.answer()
+
+
+@dp.callback_query(F.data == 'week_mariia')
+async def watch_week_artur(callback_query: CallbackQuery):
+    callback_data = callback_query.data
+
+    keyboard = await kb.year_month()
+    await callback_query.message.edit_reply_markup(reply_markup=keyboard)
+
+    await callback_query.answer()
+
+
+@dp.callback_query(F.data.startswith('month'))
+async def press_month(callback_query: CallbackQuery):
+    callback_data = int(callback_query.data.replace('month', ''))
+    generate_calendar(callback_data)
+    # Создаем объект FSInputFile для отправки файла
+    photo = FSInputFile("calendar.png")
+
+    # Отправляем сгенерированное изображение в чат
+    await callback_query.message.answer_photo(photo)
+
+    # Подтверждаем обработку callback
+    await callback_query.answer()
+
 
 
 # Запуск бота

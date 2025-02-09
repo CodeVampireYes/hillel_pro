@@ -1,58 +1,29 @@
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 
 # Рабочие дни и выходные для Артура
-work_artur = ['work', 'work', 'weekend', 'weekend', 'weekend', 'work', 'work', 'weekend', 'weekend',
-              'work', 'work', 'work', 'weekend', 'weekend']
-list_weekend_artur = []
+work_artur = ['day', 'day', 'weekend', 'weekend', 'weekend', 'night', 'night', 'weekend', 'weekend',
+              'day', 'day', 'day', 'weekend', 'weekend', 'night', 'night', 'weekend', 'weekend', 'weekend', 'day',
+              'day', 'weekend', 'weekend',
+              'night', 'night', 'night', 'weekend', 'weekend']
 
-def weekend_artur():
-    start_data = datetime(2024, 9, 4)  # Начальная дата для Артура
-    global work_artur
+work_mariia = ['day', 'day', 'night', 'night', 'weekend', 'weekend']
 
-    for day in range(900):
-        current_day_type = work_artur[day % len(work_artur)]  # Циклически перебираем список work_artur
-        if current_day_type == 'weekend':
-            list_weekend_artur.append(str(start_data)[:10])
-        start_data += timedelta(1)
-
-    return list_weekend_artur
-
-# Рабочие дни и выходные для Марии
-list_weekend_mariia = []
-work_mariia = ['work', 'work', 'work', 'work', 'weekend', 'weekend']
-
-def weekend_mariia():
-    start_data = datetime(2025, 2, 7)  # Начальная дата для Марии
-    global work_mariia
-
-    for day in range(900):
-        current_day_type = work_mariia[day % len(work_mariia)]  # Циклически перебираем список work_mariia
-        if current_day_type == 'weekend':
-            list_weekend_mariia.append(str(start_data)[:10])
-        start_data += timedelta(1)
-
-    return list_weekend_mariia
-
-together_list = []
-
-# Функция для поиска общих выходных, которые больше сегодняшней даты
-def together_weekend():
-    # Получаем списки выходных
-    weekend_mariia()
-    weekend_artur()
-
-    # Находим общие выходные
-    common_el = set(list_weekend_mariia) & set(list_weekend_artur)
-    common_el = list(common_el)
-
-    # Получаем текущую дату
-    today = datetime.now().strftime('%Y-%m-%d')
-
-    # Фильтруем общие выходные, оставляя только те, которые больше сегодняшней даты
-    future_common_el = [date for date in common_el if date > today]
-
-    # Сортируем и выводим результат
-    for date in sorted(future_common_el):
-        together_list.append(date)
+work_calendar_artur = []
 
 
+def grafik_artur():
+    start_date = date(2024, 5, 15)
+
+    current_date = start_date
+
+    for i in range(900):
+        # Циклически выбираем тип дня из графика
+        day_type = work_artur[i % len(work_artur)]
+        # Добавляем дату и тип дня в календарь
+        work_calendar_artur.append([str(current_date), day_type])
+        # Переходим к следующему дню
+        current_date += timedelta(days=1)
+
+    return work_calendar_artur
+grafik_artur()
+print(work_calendar_artur)

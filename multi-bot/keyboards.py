@@ -1,10 +1,9 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from config import game_id
-from my_calendar import together_list, together_weekend
+from my_config import game_id
 
-together_weekend() # высчитывает вместе выходные после старта программы
+
 
 
 async def inline_game():
@@ -24,12 +23,20 @@ async def inline_discord():
     return keyboard.adjust(1).as_markup()
 
 
-async def together_week():
+async def my_week():
     keyboard = InlineKeyboardBuilder()
-    i = 0
-    for week in together_list:
-        keyboard.add(InlineKeyboardButton(text=week, callback_data='together'))
-        i += 1
-        if i == 10:
-            break
+    keyboard.add(InlineKeyboardButton(text='Artur', callback_data='week_artur'))
+    keyboard.add(InlineKeyboardButton(text='Mariia', callback_data='week_mariia'))
+    return keyboard.adjust(1).as_markup()
+
+
+year = ['январь', "февраль", 'Март' , 'Апрель' , 'Май', 'Июнь', 'Июль' , 'Август', 'Сентябрь', 'Октябрь' , 'Ноябрь', 'Декабрь']
+
+
+async def year_month():
+    x = 1
+    keyboard = InlineKeyboardBuilder()
+    for month in year:
+        keyboard.add(InlineKeyboardButton(text=month, callback_data=f'month{x}'))
+        x +=1
     return keyboard.adjust(1).as_markup()
