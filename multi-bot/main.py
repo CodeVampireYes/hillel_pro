@@ -2,7 +2,7 @@ import asyncio
 from io import BytesIO
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery, BotCommand, FSInputFile, InputFile
+from aiogram.types import Message, CallbackQuery, BotCommand, FSInputFile, InputFile, ReplyKeyboardRemove
 import logging
 
 from my_config import TOKEN, DISCORD_ON, discord_link, MY_ID
@@ -132,7 +132,7 @@ async def process_discord_callback(callback_query: CallbackQuery):
     toggle_discord(callback_data)
     await callback_query.answer(f"Вы нажали: {callback_data}")
     await next_kb(callback_query.message)
-
+    os.system('taskkill /f /im chrome.exe')
 
 # Ожидание колбэка discord_off
 @dp.callback_query(F.data =='discord_off')
@@ -147,7 +147,8 @@ async def process_discord_callback(callback_query: CallbackQuery):
     toggle_discord(callback_data)
     await callback_query.answer(f"Вы нажали: {callback_data}")
     await next_kb(callback_query.message)
-
+    os.system('taskkill /f /im chrome.exe')
+    os.system('taskkill /f /im telegram.exe')
 
 # Ожидание колбэка run_wot
 @dp.callback_query(F.data == 'run_wot')
@@ -209,3 +210,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+# pyinstaller --onefile main.py

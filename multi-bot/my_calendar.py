@@ -26,4 +26,3 @@ def grafik_artur():
 
     return work_calendar_artur
 grafik_artur()
-print(work_calendar_artur)
