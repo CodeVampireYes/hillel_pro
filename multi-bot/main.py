@@ -6,9 +6,10 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, BotCommand, FSInputFile, InputFile, ReplyKeyboardRemove
 import logging
 
+
 import keyboards as kb  # Импортируем клавиатуры
 from calendar_png import generate_calendar
-from bd_config import cursor, conn
+from bd_config import cursor, conn, cursor_2, conn_2
 
 import os
 
@@ -112,6 +113,27 @@ async def bot_db(message: Message):
                  f"🔹ID: {row[3]}\n"
                  f"🔹Name: {message.from_user.first_name} "
         )
+
+    cursor_2.execute('SELECT * FROM Film')
+    rows_2 = cursor_2.fetchall()
+    print(rows_2)
+
+# Фильтр сообщений, которые начинаются с "Привет"
+@dp.message()
+async def handle_message(message: Message):
+    if message.text.startswith("Привет"):  # Проверяем начало сообщения
+        text_after = message.text[len("Привет"):].strip()  # Убираем "Привет" и пробелы
+        if text_after:
+            cursor_2.execute("INSERT INTO Film (name_film) VALUES (?)", (text_after,))
+            conn_2.commit()  # Ensure changes are committed to the database
+            response = f"Фильм '{text_after}' добавлен!"  # Confirmation message
+        else:
+            response = "Ты ничего не написал после 'Привет'!"  # Message if nothing is written after "Привет"
+
+        await message.answer(response)  # Send the response back to the user
+
+
+
 
 
 # Ожидание колбэка который начинается на id_
