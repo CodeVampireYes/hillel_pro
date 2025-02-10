@@ -1,16 +1,17 @@
 import asyncio
+import sqlite3
 from io import BytesIO
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, BotCommand, FSInputFile, InputFile, ReplyKeyboardRemove
 import logging
 
-from my_config import TOKEN, DISCORD_ON, discord_link, MY_ID
 import keyboards as kb  # Импортируем клавиатуры
 from calendar_png import generate_calendar
+from bd_config import cursor, conn
 
 import os
-import time
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -30,41 +31,38 @@ async def set_commands(bot: Bot):
     await bot.set_my_commands(commands)
 
 
-# Создаем бота и диспетчер
-bot = Bot(TOKEN)
+# Создаем бота и диспетчер + sql3
+cursor.execute('SELECT token FROM users')
+TOKEN = cursor.fetchone()
+
+bot = Bot(TOKEN[0])
 dp = Dispatcher()
 
 
 # Функция запуска игр стим и дискорда
 def run_game_steam(value: str):
-    global DISCORD_ON
-    if DISCORD_ON == False:
+    cursor.execute('SELECT discord_on, discord_link FROM users')
+    result = cursor.fetchall()
+    if result[0][0] == 'False':
         os.system(f'start steam://run/{value[3:]}')
     else:
-        os.system(discord_link)
+        os.system(result[0][1])
         os.system(f'start steam://run/{value[3:]}')
 
 
 # Функция запуска wot и дискорда
 ## улучшить для всех декстоп приложений ##
 def run_game_wot():
-    global DISCORD_ON
-    if DISCORD_ON == False:
+    cursor.execute('SELECT discord_on, discord_link FROM users')
+    result = cursor.fetchall()
+    if result[0][0] == 'False':
         os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
     else:
-        os.system(discord_link)
+        os.system(result[0][1])
         os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
 
 
 # Функция переключения состояния запуска дискорд
-def toggle_discord(values):
-    global DISCORD_ON
-    if values == 'discord_on':
-        DISCORD_ON = True
-        return DISCORD_ON
-    else:
-        DISCORD_ON = False
-        return DISCORD_ON
 
 
 async def next_kb(message: Message):
@@ -80,7 +78,7 @@ async def get_my_id(message: Message):
 # Обработчик команды /go
 @dp.message(Command("go"))
 async def start_command(message: Message):
-    if message.from_user.id == MY_ID:
+    if message.from_user.id == 5409293287:
         await message.reply(text="Какую игру запустить", reply_markup=await kb.inline_game())
         await message.delete()
     else:
@@ -91,7 +89,7 @@ async def start_command(message: Message):
     # Обработчик команды /discord
 @dp.message(Command('discord'))
 async def on_discord(message: Message):
-    if message.from_user.id == MY_ID:
+    if message.from_user.id == 5409293287:
         await message.reply(text='Запускать с игрой дискорд?', reply_markup=await kb.inline_discord())
         await message.delete()
     else:
@@ -103,6 +101,22 @@ async def on_discord(message: Message):
 async def my_week(message: Message):
     await message.reply(text='Выходные:', reply_markup=await kb.my_week())
     await message.delete()
+
+
+@dp.message(Command('db'))
+async def bot_db(message: Message):
+    cursor.execute('SELECT * FROM users')
+    rows = cursor.fetchall()
+    for row in rows:
+        await message.answer(
+            text=f"🔹Token: {row[0]}\n"
+                 f"🔹Discord ON: {row[1]}\n"
+                 f"🔹Discord Link: {row[2]}\n"
+                 f"🔹ID: {row[3]}\n"
+                 f"🔹Name: {message.from_user.first_name} "
+        )
+
+
 
 # Ожидание колбэка который начинается на id_
 @dp.callback_query(F.data.startswith('id_'))  # Фильтруем все callback_data
@@ -129,26 +143,28 @@ async def process_discord_callback(callback_query: CallbackQuery):
     message_id = callback_query.message.message_id
     await bot.delete_message(chat_id, message_id)
 
-    toggle_discord(callback_data)
+    cursor.execute("UPDATE users SET discord_on = ? WHERE id = ?", ('True', 5409293287))
+
     await callback_query.answer(f"Вы нажали: {callback_data}")
     await next_kb(callback_query.message)
-    os.system('taskkill /f /im chrome.exe')
+    #os.system('taskkill /f /im chrome.exe')
 
 # Ожидание колбэка discord_off
 @dp.callback_query(F.data =='discord_off')
 async def process_discord_callback(callback_query: CallbackQuery):
     callback_data = callback_query.data
+    cursor.execute("UPDATE users SET discord_on = ? WHERE id = ?", ('False', 5409293287))
 
     # Удаляем сообщение с кнопками
     chat_id = callback_query.message.chat.id
     message_id = callback_query.message.message_id
     await bot.delete_message(chat_id, message_id)
 
-    toggle_discord(callback_data)
     await callback_query.answer(f"Вы нажали: {callback_data}")
     await next_kb(callback_query.message)
-    os.system('taskkill /f /im chrome.exe')
-    os.system('taskkill /f /im telegram.exe')
+    #os.system('taskkill /f /im chrome.exe')
+    #os.system('taskkill /f /im telegram.exe')
+
 
 # Ожидание колбэка run_wot
 @dp.callback_query(F.data == 'run_wot')

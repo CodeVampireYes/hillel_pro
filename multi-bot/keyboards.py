@@ -26,7 +26,7 @@ async def inline_discord():
 async def my_week():
     keyboard = InlineKeyboardBuilder()
     keyboard.add(InlineKeyboardButton(text='Artur', callback_data='week_artur'))
-    keyboard.add(InlineKeyboardButton(text='Mariia', callback_data='week_mariia'))
+    #keyboard.add(InlineKeyboardButton(text='Mariia', callback_data='week_mariia'))
     return keyboard.adjust(1).as_markup()
 
 
