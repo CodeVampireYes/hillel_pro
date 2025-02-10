@@ -22,6 +22,7 @@ commands = [
     BotCommand(command="go", description="Запустить игру"),
     BotCommand(command="discord", description="Настройка запуска Discord"),
     BotCommand(command="myid", description="Мой id"),
+    BotCommand(command="db", description="Data Base"),
 ]
 
 

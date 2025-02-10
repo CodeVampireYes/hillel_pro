@@ -1,9 +1,7 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from my_config import game_id
-
-
 
 
 async def inline_game():
@@ -40,3 +38,5 @@ async def year_month():
         keyboard.add(InlineKeyboardButton(text=month, callback_data=f'month{x}'))
         x +=1
     return keyboard.adjust(2).as_markup()
+
+
