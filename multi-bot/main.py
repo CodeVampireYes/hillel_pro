@@ -22,7 +22,6 @@ commands = [
     BotCommand(command="go", description="Запустить игру"),
     BotCommand(command="discord", description="Настройка запуска Discord"),
     BotCommand(command="myid", description="Мой id"),
-
 ]
 
 
@@ -62,9 +61,6 @@ def run_game_wot():
         os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
 
 
-# Функция переключения состояния запуска дискорд
-
-
 async def next_kb(message: Message):
     await message.answer(text="Какую игру запустить", reply_markup=await kb.inline_game())
 
@@ -86,7 +82,7 @@ async def start_command(message: Message):
         await message.delete()
 
 
-    # Обработчик команды /discord
+# Обработчик команды /discord
 @dp.message(Command('discord'))
 async def on_discord(message: Message):
     if message.from_user.id == 5409293287:
@@ -115,7 +111,6 @@ async def bot_db(message: Message):
                  f"🔹ID: {row[3]}\n"
                  f"🔹Name: {message.from_user.first_name} "
         )
-
 
 
 # Ожидание колбэка который начинается на id_
@@ -148,6 +143,7 @@ async def process_discord_callback(callback_query: CallbackQuery):
     await callback_query.answer(f"Вы нажали: {callback_data}")
     await next_kb(callback_query.message)
     #os.system('taskkill /f /im chrome.exe')
+
 
 # Ожидание колбэка discord_off
 @dp.callback_query(F.data =='discord_off')
@@ -216,7 +212,6 @@ async def press_month(callback_query: CallbackQuery):
     chat_id = callback_query.message.chat.id
     message_id = callback_query.message.message_id
     await bot.delete_message(chat_id, message_id)
-
 
 
 # Запуск бота
