@@ -10,6 +10,7 @@ import logging
 import keyboards as kb  # Импортируем клавиатуры
 from calendar_png import generate_calendar
 from bd_config import cursor, conn, cursor_2, conn_2
+from parser.parser_film import parser_site
 
 import os
 
@@ -117,6 +118,28 @@ async def bot_db(message: Message):
     cursor_2.execute('SELECT * FROM Film')
     rows_2 = cursor_2.fetchall()
     print(rows_2)
+
+
+@dp.message(Command('parse'))
+async def start_parse(message: Message):
+    # Вызов функции парсинга
+    parser_site()
+
+    # Выборка данных из базы данных
+    cursor_2.execute('SELECT parse_film FROM Film')
+    rows_2 = cursor_2.fetchall()
+
+    # Обработка результатов
+    for row in rows_2:
+        name = row[0]
+        if name is not None and name.startswith('Декстер'):  # Проверка на None и начало строки
+            await message.answer(str(name))  # Преобразуем кортеж в строку для вывода
+            break
+    cursor_2.execute("""
+        UPDATE Film
+        SET parse_film = NULL;
+    """)
+    conn.close()
 
 # Фильтр сообщений, которые начинаются с "Привет"
 @dp.message()
