@@ -11,6 +11,8 @@ import keyboards as kb  # Импортируем клавиатуры
 from calendar_png import generate_calendar
 from bd_config import cursor, conn, cursor_2, conn_2
 from parser.parser_film import parser_site
+from my_calendar import work_calendar_mariia
+
 
 import os
 
@@ -68,6 +70,11 @@ async def next_kb(message: Message):
     await message.answer(text="Какую игру запустить", reply_markup=await kb.inline_game())
 
 
+@dp.message(Command('start'))
+async def start(message: Message):
+    await message.answer(text='', reply_markup=await kb.start_kb())
+
+
 @dp.message(Command('myid'))
 async def get_my_id(message: Message):
     await message.answer(f'{message.from_user.id}')
@@ -113,6 +120,7 @@ async def bot_db(message: Message):
                  f"🔹Discord Link: {row[2]}\n"
                  f"🔹ID: {row[3]}\n"
                  f"🔹Name: {message.from_user.first_name} "
+                 f"🔹ID: {row[5]}\n"
         )
 
     cursor_2.execute('SELECT * FROM Film')
@@ -226,6 +234,11 @@ async def game_wot(callback_query: CallbackQuery):
 async def watch_week_artur(callback_query: CallbackQuery):
     callback_data = callback_query.data
 
+    cursor.execute("""
+        UPDATE users
+        SET list_weekend = '1'
+    """)
+    conn.commit()
     keyboard = await kb.year_month()
     await callback_query.message.edit_reply_markup(reply_markup=keyboard)
 
@@ -235,6 +248,12 @@ async def watch_week_artur(callback_query: CallbackQuery):
 @dp.callback_query(F.data == 'week_mariia')
 async def watch_week_artur(callback_query: CallbackQuery):
     callback_data = callback_query.data
+
+    cursor.execute("""
+            UPDATE users
+            SET list_weekend = '0'
+        """)
+    conn.commit()
 
     keyboard = await kb.year_month()
     await callback_query.message.edit_reply_markup(reply_markup=keyboard)

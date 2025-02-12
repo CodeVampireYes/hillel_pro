@@ -9,6 +9,7 @@ work_artur = ['day', 'day', 'weekend', 'weekend', 'weekend', 'night', 'night', '
 work_mariia = ['day', 'day', 'night', 'night', 'weekend', 'weekend']
 
 work_calendar_artur = []
+work_calendar_mariia = []
 
 
 def grafik_artur():
@@ -25,4 +26,23 @@ def grafik_artur():
         current_date += timedelta(days=1)
 
     return work_calendar_artur
+
 grafik_artur()
+
+def grafik_mariia():
+    start_date = date(2025, 2, 13)
+
+    current_date = start_date
+
+    for i in range(900):
+        # Циклически выбираем тип дня из графика
+        day_type = work_mariia[i % len(work_mariia)]
+        # Добавляем дату и тип дня в календарь
+        work_calendar_mariia.append([str(current_date), day_type])
+        # Переходим к следующему дню
+        current_date += timedelta(days=1)
+
+    return work_calendar_mariia
+
+
+grafik_mariia()

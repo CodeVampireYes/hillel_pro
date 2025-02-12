@@ -1,7 +1,8 @@
 import calendar
 import matplotlib.pyplot as plt
-from my_calendar import work_calendar_artur
+from my_calendar import work_calendar_artur, work_calendar_mariia
 from datetime import datetime
+from bd_config import cursor
 
 
 def generate_calendar(month_number):
@@ -12,6 +13,14 @@ def generate_calendar(month_number):
     :param month_number: Номер месяца (1-12).
     :return: Имя файла с изображением календаря.
     """
+    cursor.execute('SELECT list_weekend FROM users')
+    result = cursor.fetchone()
+    print(type(result))
+    print(result[0])
+    if result[0] == '1':
+        list_weekend = work_calendar_artur
+    else:
+        list_weekend = work_calendar_mariia
     year = 2025  # Можно заменить на текущий год
     cal = calendar.monthcalendar(year, month_number)
 
@@ -24,7 +33,7 @@ def generate_calendar(month_number):
 
     # Преобразуем work_calendar_artur в словарь для быстрого доступа
     work_dates = {}
-    for date_str, day_type in work_calendar_artur:
+    for date_str, day_type in list_weekend:
 
         work_dates[date_str] = day_type
 
@@ -75,3 +84,5 @@ def generate_calendar(month_number):
     plt.close()
 
     return filename
+
+

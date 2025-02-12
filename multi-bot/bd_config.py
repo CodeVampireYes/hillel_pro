@@ -1,7 +1,9 @@
 import sqlite3
+path_to_example_db = r'C:\ALL\PROGRAMS\hillel_pro\multi-bot\example.db'  # Для Windows
+
 
 # Подключение к базе данных (или создание новой, если она не существует)
-with sqlite3.connect('example.db') as conn:
+with sqlite3.connect(path_to_example_db) as conn:
     # Создание курсора для выполнения SQL-запросов
     cursor = conn.cursor()
 
