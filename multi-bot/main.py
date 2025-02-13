@@ -6,13 +6,11 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, BotCommand, FSInputFile, InputFile, ReplyKeyboardRemove
 import logging
 
-
 import keyboards as kb  # Импортируем клавиатуры
 from calendar_png import generate_calendar
 from bd_config import cursor, conn, cursor_2, conn_2
 from parser.parser_film import parser_site
 from my_calendar import work_calendar_mariia
-
 
 import os
 
