@@ -22,11 +22,11 @@ logging.basicConfig(level=logging.INFO)
 # Список команд с описаниями
 commands = [
     BotCommand(command="week", description="Weekend"),
-    BotCommand(command="tog", description="Показать выходные"),
     BotCommand(command="go", description="Запустить игру"),
     BotCommand(command="discord", description="Настройка запуска Discord"),
     BotCommand(command="myid", description="Мой id"),
     BotCommand(command="db", description="Data Base"),
+    BotCommand(command="parse", description="Parse"),
 ]
 
 
@@ -88,7 +88,7 @@ async def start_command(message: Message):
         await message.reply(text="Какую игру запустить", reply_markup=await kb.inline_game())
         await message.delete()
     else:
-        await message.answer(f'Для вас {message.from_user.first_name} доступна только команда /tog')
+        await message.answer(f'Для вас {message.from_user.first_name} доступна только команда /week')
         await message.delete()
 
 
@@ -99,7 +99,7 @@ async def on_discord(message: Message):
         await message.reply(text='Запускать с игрой дискорд?', reply_markup=await kb.inline_discord())
         await message.delete()
     else:
-        await message.answer(f'Для вас {message.from_user.first_name} доступна только команда /tog')
+        await message.answer(f'Для вас {message.from_user.first_name} доступна только команда /week')
         await message.delete()
 
 
