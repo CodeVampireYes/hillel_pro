@@ -149,6 +149,7 @@ async def start_parse(message: Message):
     """)
     conn.close()
 
+
 # Фильтр сообщений, которые начинаются с "Привет"
 @dp.message()
 async def handle_message(message: Message):
@@ -162,9 +163,6 @@ async def handle_message(message: Message):
             response = "Ты ничего не написал после 'Привет'!"  # Message if nothing is written after "Привет"
 
         await message.answer(response)  # Send the response back to the user
-
-
-
 
 
 # Ожидание колбэка который начинается на id_
