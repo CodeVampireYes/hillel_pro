@@ -12,6 +12,7 @@ from bd_config import cursor, conn, cursor_2, conn_2
 from parser.parser_film import parser_site
 from my_calendar import work_calendar_mariia
 from database import db
+from indicator_pi import get_rpi_metrics
 
 import os
 
@@ -163,9 +164,18 @@ async def bot_db(message: Message):
 # Фильтр сообщений, которые начинаются с "Привет"
 
 
-@dp.message(Command('indicators_pi'))
+@dp.message(Command("indicators_pi"))
 async def bot_db(message: Message):
-    pass
+    """Raspberry Pi Telegram"""
+    metrics = get_rpi_metrics()
+    text = (
+        f"Raspberry Pi:*\n"
+        f" CPU: {metrics['cpu_usage']}%\n"
+        f" GPU: {metrics['gpu_usage']}%\n"
+        f" RAM: {metrics['memory_usage']}%\n"
+        f" Temp: {metrics['temperature']}°C"
+    )
+    await message.answer(text, parse_mode="Markdown")
 
 @dp.message()
 async def handle_message(message: Message):
