@@ -28,6 +28,7 @@ commands = [
     BotCommand(command="myid", description="Мой id"),
     BotCommand(command="db", description="Data Base"),
     #BotCommand(command="parse", description="Parse"),
+    BotCommand(command="indicators_pi", description="indicators_pi"),
 ]
 
 
