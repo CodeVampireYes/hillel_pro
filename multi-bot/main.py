@@ -11,6 +11,7 @@ from calendar_png import generate_calendar
 from bd_config import cursor, conn, cursor_2, conn_2
 from parser.parser_film import parser_site
 from my_calendar import work_calendar_mariia
+from database import db
 
 import os
 
@@ -19,12 +20,13 @@ logging.basicConfig(level=logging.INFO)
 
 # Список команд с описаниями
 commands = [
+    BotCommand(command="start", description="Start"),
     BotCommand(command="week", description="Weekend"),
-    BotCommand(command="go", description="Запустить игру"),
-    BotCommand(command="discord", description="Настройка запуска Discord"),
+    #BotCommand(command="go", description="Запустить игру"),
+    #BotCommand(command="discord", description="Настройка запуска Discord"),
     BotCommand(command="myid", description="Мой id"),
     BotCommand(command="db", description="Data Base"),
-    BotCommand(command="parse", description="Parse"),
+    #BotCommand(command="parse", description="Parse"),
 ]
 
 
@@ -33,11 +35,8 @@ async def set_commands(bot: Bot):
     await bot.set_my_commands(commands)
 
 
-# Создаем бота и диспетчер + sql3
-cursor.execute('SELECT token FROM users')
-TOKEN = cursor.fetchone()
 
-bot = Bot(TOKEN[0])
+bot = Bot('7829549608:AAFWlZVs4KoMpNVO5SRHptLRMHRiI2GT9CU')
 dp = Dispatcher()
 
 
@@ -70,7 +69,23 @@ async def next_kb(message: Message):
 
 @dp.message(Command('start'))
 async def start(message: Message):
-    await message.answer(text='', reply_markup=await kb.start_kb())
+    user_id = message.from_user.id
+    username = message.from_user.username or "Unknown"  # Если у пользователя нет username
+
+    async with db.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                """
+                INSERT INTO users (user_id, username) 
+                VALUES (%s, %s) 
+                ON DUPLICATE KEY UPDATE username = VALUES(username)
+                """,
+                (user_id, username)
+            )
+            await conn.commit()  # Сохраняем изменения
+
+    await message.answer(f'Привет, {username}! С возвращением! 😊')
+
 
 
 @dp.message(Command('myid'))
@@ -109,46 +124,49 @@ async def my_week(message: Message):
 
 @dp.message(Command('db'))
 async def bot_db(message: Message):
-    cursor.execute('SELECT * FROM users')
-    rows = cursor.fetchall()
-    for row in rows:
-        await message.answer(
-            text=f"🔹Token: {row[0]}\n"
-                 f"🔹Discord ON: {row[1]}\n"
-                 f"🔹Discord Link: {row[2]}\n"
-                 f"🔹ID: {row[3]}\n"
-                 f"🔹Name: {message.from_user.first_name} "
-                 f"🔹ID: {row[5]}\n"
-        )
+    async with db.pool.acquire() as conn:  # Используем асинхронное подключение
+        async with conn.cursor() as cursor:
+            await cursor.execute("SHOW COLUMNS FROM users")  # Получаем названия колонок
+            columns = [row[0] for row in await cursor.fetchall()]
 
-    cursor_2.execute('SELECT * FROM Film')
-    rows_2 = cursor_2.fetchall()
-    print(rows_2)
+            await cursor.execute("SELECT * FROM users")  # Получаем данные пользователей
+            users = await cursor.fetchall()
+
+            for user in users:
+                user_info = "\n".join([f"🔹 {col}: {val}" for col, val in zip(columns, user)])
+                await message.answer(user_info)
 
 
-@dp.message(Command('parse'))
-async def start_parse(message: Message):
-    # Вызов функции парсинга
-    parser_site()
 
-    # Выборка данных из базы данных
-    cursor_2.execute('SELECT parse_film FROM Film')
-    rows_2 = cursor_2.fetchall()
-
-    # Обработка результатов
-    for row in rows_2:
-        name = row[0]
-        if name is not None and name.startswith('Декстер'):  # Проверка на None и начало строки
-            await message.answer(str(name))  # Преобразуем кортеж в строку для вывода
-            break
-    cursor_2.execute("""
-        UPDATE Film
-        SET parse_film = NULL;
-    """)
-    conn.close()
+# @dp.message(Command('parse'))
+# async def start_parse(message: Message):
+#     # Вызов функции парсинга
+#     parser_site()
+#
+#     # Выборка данных из базы данных
+#     cursor_2.execute('SELECT parse_film FROM Film')
+#     rows_2 = cursor_2.fetchall()
+#
+#     # Обработка результатов
+#     for row in rows_2:
+#         name = row[0]
+#         if name is not None and name.startswith('Декстер'):  # Проверка на None и начало строки
+#             await message.answer(str(name))  # Преобразуем кортеж в строку для вывода
+#             break
+#     cursor_2.execute("""
+#         UPDATE Film
+#         SET parse_film = NULL;
+#     """)
+#     conn.close()
 
 
 # Фильтр сообщений, которые начинаются с "Привет"
+
+
+@dp.message(Command('indicators_pi'))
+async def bot_db(message: Message):
+    pass
+
 @dp.message()
 async def handle_message(message: Message):
     if message.text.startswith("Привет"):  # Проверяем начало сообщения
@@ -228,57 +246,68 @@ async def game_wot(callback_query: CallbackQuery):
 
 @dp.callback_query(F.data == 'week_artur')
 async def watch_week_artur(callback_query: CallbackQuery):
-    callback_data = callback_query.data
+    async with db.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute("""
+                UPDATE users
+                SET list_weekend = '1'
+            """)
+            await conn.commit()
 
-    cursor.execute("""
-        UPDATE users
-        SET list_weekend = '1'
-    """)
-    conn.commit()
     keyboard = await kb.year_month()
     await callback_query.message.edit_reply_markup(reply_markup=keyboard)
-
     await callback_query.answer()
 
 
 @dp.callback_query(F.data == 'week_mariia')
-async def watch_week_artur(callback_query: CallbackQuery):
-    callback_data = callback_query.data
-
-    cursor.execute("""
-            UPDATE users
-            SET list_weekend = '0'
-        """)
-    conn.commit()
+async def watch_week_mariia(callback_query: CallbackQuery):
+    async with db.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute("""
+                UPDATE users
+                SET list_weekend = '0'
+            """)
+            await conn.commit()
 
     keyboard = await kb.year_month()
     await callback_query.message.edit_reply_markup(reply_markup=keyboard)
-
     await callback_query.answer()
 
 
 @dp.callback_query(F.data.startswith('month'))
 async def press_month(callback_query: CallbackQuery):
     callback_data = int(callback_query.data.replace('month', ''))
-    generate_calendar(callback_data)
-    # Создаем объект FSInputFile для отправки файла
-    photo = FSInputFile("calendar.png")
 
-    # Отправляем сгенерированное изображение в чат
-    await callback_query.message.answer_photo(photo)
+    # Используем await для генерации календаря
+    filename = await generate_calendar(callback_data)
 
-    # Подтверждаем обработку callback
+    # Проверяем, что файл существует перед отправкой
+    if os.path.exists(filename):
+        photo = FSInputFile(filename)
+        await callback_query.message.answer_photo(photo)
+    else:
+        await callback_query.message.answer("Ошибка: не удалось создать изображение календаря.")
+
     await callback_query.answer()
-    # Удаляем сообщение с кнопками
-    chat_id = callback_query.message.chat.id
-    message_id = callback_query.message.message_id
-    await bot.delete_message(chat_id, message_id)
+    await bot.delete_message(callback_query.message.chat.id, callback_query.message.message_id)
+
 
 
 # Запуск бота
+# ✅ Основная функция запуска
 async def main():
+    print("⏳ Подключение к базе данных...")
+    await db.connect()  # Подключаем MySQL
+    print("✅ База данных подключена!")
+
     await set_commands(bot)
-    await dp.start_polling(bot)
+
+    try:
+        print("🚀 Бот запущен!")
+        await dp.start_polling(bot)
+    finally:
+        print("❌ Завершаем работу... Закрываем соединение с БД.")
+        await db.close()  # Закрываем MySQL соединение
 
 if __name__ == "__main__":
     asyncio.run(main())
