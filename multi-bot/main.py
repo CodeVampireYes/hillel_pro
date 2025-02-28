@@ -173,9 +173,9 @@ async def bot_db(message: Message):
         f" CPU: {metrics['cpu_usage']}%\n"
         f" GPU: {metrics['gpu_usage']}%\n"
         f" RAM: {metrics['memory_usage']}%\n"
-        f" Temp: {metrics['temperature']}°C"
+        f" Temp: {metrics['temperature']}"
     )
-    await message.answer(text, parse_mode="Markdown")
+    await message.answer(text)
 
 @dp.message()
 async def handle_message(message: Message):
