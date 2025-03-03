@@ -168,7 +168,7 @@ async def bot_indicators_pi(message: Message):
     """Вывод метрик Raspberry Pi в Telegram"""
 
     try:
-        metrics = await get_rpi_metrics()
+        metrics = get_rpi_metrics()
         text = (
             f"*📟 Raspberry Pi Metrics:*\n"
             f"🔹 *CPU Usage:* {metrics['cpu_usage']}%\n"
