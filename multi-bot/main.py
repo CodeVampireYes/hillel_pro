@@ -164,17 +164,18 @@ async def bot_db(message: Message):
 
 
 @dp.message(Command("indicators_pi"))
-async def bot_db(message: Message):
+async def bot_indicators_pi(message: Message):
     """Raspberry Pi Telegram"""
-    metrics = await get_rpi_metrics()
+    metrics = await get_rpi_metrics()  # Добавили await
     text = (
-        f"Raspberry Pi:*\n"
-        f" CPU: {metrics['cpu_usage']}%\n"
-        f" GPU: {metrics['gpu_usage']}%\n"
-        f" RAM: {metrics['memory_usage']}%\n"
-        f" Temp: {metrics['temperature']}"
+        f"*Raspberry Pi Metrics:*\n"
+        f"🔹 *CPU Usage:* {metrics['cpu_usage']}%\n"
+        f"🔹 *GPU Usage:* {metrics['gpu_usage']}%\n"
+        f"🔹 *RAM Usage:* {metrics['memory_usage']}%\n"
+        f"🔹 *Temperature:* {metrics['temperature']}°C"
     )
-    await message.answer(text)
+    await message.answer(text, parse_mode="Markdown")
+
 
 # @dp.message()
 # async def handle_message(message: Message):
