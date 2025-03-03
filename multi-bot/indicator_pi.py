@@ -1,7 +1,4 @@
-import psutil
-import subprocess
-
-def get_rpi_metrics():
+async def get_rpi_metrics():
     """Получение метрик Raspberry Pi"""
 
     # CPU usage
@@ -17,6 +14,12 @@ def get_rpi_metrics():
     # Memory usage
     memory_usage = psutil.virtual_memory().percent
 
+    # Disk usage
+    disk_usage = psutil.disk_usage('/').percent
+
+    # Running processes
+    running_processes = len(psutil.pids())
+
     # CPU temperature
     try:
         with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
@@ -28,6 +31,7 @@ def get_rpi_metrics():
         "cpu_usage": cpu_usage,
         "gpu_usage": 0.0,  # GPU usage измерить сложно
         "memory_usage": memory_usage,
+        "disk_usage": disk_usage,
+        "running_processes": running_processes,
         "temperature": cpu_temp
     }
-
