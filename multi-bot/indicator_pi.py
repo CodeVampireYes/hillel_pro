@@ -38,7 +38,7 @@ async def get_rpi_metrics():
             async with conn.cursor() as cursor:
                 await cursor.execute(
                     """
-                    INSERT INTO rpi_metrics (cpu_usage, memory_usage, disk_usage, temperature, running_processes)
+                    INSERT INTO system_metrics (cpu_usage, memory_usage, disk_usage, temperature, running_processes)
                     VALUES (%s, %s, %s, %s, %s)
                     """,
                     (cpu_usage, memory_usage, disk_usage, cpu_temp, processes)
