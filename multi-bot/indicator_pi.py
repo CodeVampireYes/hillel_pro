@@ -1,13 +1,19 @@
 import psutil
 import subprocess
+import shlex
+from database import db
 
-def get_rpi_metrics():
+
+async def get_rpi_metrics():
     # CPU usage
     cpu_usage = psutil.cpu_percent(interval=1)
 
-    # GPU usage (нет прямого способа, но можно использовать vcgencmd для проверки температуры GPU)
-    gpu_temp = subprocess.check_output("vcgencmd measure_temp", shell=True).decode("utf-8")
-    gpu_temp = float(gpu_temp.replace("temp=", "").replace("'C\n", ""))
+    # GPU temperature (Raspberry Pi)
+    try:
+        gpu_temp_output = subprocess.check_output(shlex.split("vcgencmd measure_temp")).decode("utf-8")
+        gpu_temp = float(gpu_temp_output.replace("temp=", "").replace("'C\n", ""))
+    except Exception:
+        gpu_temp = None  # Если команда не выполняется, установим значение в None
 
     # Memory usage
     memory = psutil.virtual_memory()
@@ -21,10 +27,21 @@ def get_rpi_metrics():
     except FileNotFoundError:
         cpu_temp = gpu_temp  # Если нет доступа к файлу, используем GPU temp
 
+    # Запись в базу данных
+    async with db.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                """
+                INSERT INTO metrics (cpu_usage, gpu_temp, memory_usage, temperature, timestamp)
+                VALUES (%s, %s, %s, %s, NOW())
+                """,
+                (cpu_usage, gpu_temp, memory_usage, cpu_temp)
+            )
+            await conn.commit()  # Сохраняем изменения
+
     return {
         "cpu_usage": cpu_usage,
-        "gpu_usage": 0.0,  # GPU usage сложно измерить, ставим 0
+        "gpu_usage": None,  # GPU usage сложно измерить, поэтому убрал 0.0
         "memory_usage": memory_usage,
         "temperature": cpu_temp
     }
-

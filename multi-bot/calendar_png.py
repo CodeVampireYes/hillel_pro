@@ -2,7 +2,6 @@ import calendar
 import matplotlib.pyplot as plt
 from my_calendar import work_calendar_artur, work_calendar_mariia
 from datetime import datetime
-from bd_config import cursor
 from database import db  # Импортируем асинхронную БД
 
 

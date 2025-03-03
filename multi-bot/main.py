@@ -1,5 +1,4 @@
 import asyncio
-import sqlite3
 from io import BytesIO
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
@@ -8,7 +7,6 @@ import logging
 
 import keyboards as kb  # Импортируем клавиатуры
 from calendar_png import generate_calendar
-from bd_config import cursor, conn, cursor_2, conn_2
 from parser.parser_film import parser_site
 from my_calendar import work_calendar_mariia
 from database import db
@@ -43,26 +41,26 @@ dp = Dispatcher()
 
 
 # Функция запуска игр стим и дискорда
-def run_game_steam(value: str):
-    cursor.execute('SELECT discord_on, discord_link FROM users')
-    result = cursor.fetchall()
-    if result[0][0] == 'False':
-        os.system(f'start steam://run/{value[3:]}')
-    else:
-        os.system(result[0][1])
-        os.system(f'start steam://run/{value[3:]}')
+# def run_game_steam(value: str):
+#     cursor.execute('SELECT discord_on, discord_link FROM users')
+#     result = cursor.fetchall()
+#     if result[0][0] == 'False':
+#         os.system(f'start steam://run/{value[3:]}')
+#     else:
+#         os.system(result[0][1])
+#         os.system(f'start steam://run/{value[3:]}')
 
 
 # Функция запуска wot и дискорда
 ## улучшить для всех декстоп приложений ##
-def run_game_wot():
-    cursor.execute('SELECT discord_on, discord_link FROM users')
-    result = cursor.fetchall()
-    if result[0][0] == 'False':
-        os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
-    else:
-        os.system(result[0][1])
-        os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
+# def run_game_wot():
+#     cursor.execute('SELECT discord_on, discord_link FROM users')
+#     result = cursor.fetchall()
+#     if result[0][0] == 'False':
+#         os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
+#     else:
+#         os.system(result[0][1])
+#         os.system(r'C:\Games\World_of_Tanks_EU\wgc_api.exe --open')
 
 
 async def next_kb(message: Message):
@@ -178,81 +176,81 @@ async def bot_db(message: Message):
     )
     await message.answer(text)
 
-@dp.message()
-async def handle_message(message: Message):
-    if message.text.startswith("Привет"):  # Проверяем начало сообщения
-        text_after = message.text[len("Привет"):].strip()  # Убираем "Привет" и пробелы
-        if text_after:
-            cursor_2.execute("INSERT INTO Film (name_film) VALUES (?)", (text_after,))
-            conn_2.commit()  # Ensure changes are committed to the database
-            response = f"Фильм '{text_after}' добавлен!"  # Confirmation message
-        else:
-            response = "Ты ничего не написал после 'Привет'!"  # Message if nothing is written after "Привет"
-
-        await message.answer(response)  # Send the response back to the user
+# @dp.message()
+# async def handle_message(message: Message):
+#     if message.text.startswith("Привет"):  # Проверяем начало сообщения
+#         text_after = message.text[len("Привет"):].strip()  # Убираем "Привет" и пробелы
+#         if text_after:
+#             cursor_2.execute("INSERT INTO Film (name_film) VALUES (?)", (text_after,))
+#             conn_2.commit()  # Ensure changes are committed to the database
+#             response = f"Фильм '{text_after}' добавлен!"  # Confirmation message
+#         else:
+#             response = "Ты ничего не написал после 'Привет'!"  # Message if nothing is written after "Привет"
+#
+#         await message.answer(response)  # Send the response back to the user
 
 
 # Ожидание колбэка который начинается на id_
-@dp.callback_query(F.data.startswith('id_'))  # Фильтруем все callback_data
-async def process_callback(callback_query: CallbackQuery):
-    callback_data = callback_query.data  # Получаем callback_data
-
-    # Удаляем сообщение с кнопками
-    chat_id = callback_query.message.chat.id
-    message_id = callback_query.message.message_id
-    await bot.delete_message(chat_id, message_id)
-
-    run_game_steam(callback_data)  # Вызываем функцию с этим значением
-    # Обязательно отправляем ответ, иначе кнопка зависнет
-    await callback_query.answer(f"Вы нажали: {callback_data}")
+# @dp.callback_query(F.data.startswith('id_'))  # Фильтруем все callback_data
+# async def process_callback(callback_query: CallbackQuery):
+#     callback_data = callback_query.data  # Получаем callback_data
+#
+#     # Удаляем сообщение с кнопками
+#     chat_id = callback_query.message.chat.id
+#     message_id = callback_query.message.message_id
+#     await bot.delete_message(chat_id, message_id)
+#
+#     run_game_steam(callback_data)  # Вызываем функцию с этим значением
+#     # Обязательно отправляем ответ, иначе кнопка зависнет
+#     await callback_query.answer(f"Вы нажали: {callback_data}")
 
 
 # Ожидание колбэка discord_on
-@dp.callback_query(F.data =='discord_on')
-async def process_discord_callback(callback_query: CallbackQuery):
-    callback_data = callback_query.data
-
-    # Удаляем сообщение с кнопками
-    chat_id = callback_query.message.chat.id
-    message_id = callback_query.message.message_id
-    await bot.delete_message(chat_id, message_id)
-
-    cursor.execute("UPDATE users SET discord_on = ? WHERE id = ?", ('True', 5409293287))
-
-    await callback_query.answer(f"Вы нажали: {callback_data}")
-    await next_kb(callback_query.message)
+# @dp.callback_query(F.data =='discord_on')
+# async def process_discord_callback(callback_query: CallbackQuery):
+#     callback_data = callback_query.data
+#
+#     # Удаляем сообщение с кнопками
+#     chat_id = callback_query.message.chat.id
+#     message_id = callback_query.message.message_id
+#     await bot.delete_message(chat_id, message_id)
+#
+#     cursor.execute("UPDATE users SET discord_on = ? WHERE id = ?", ('True', 5409293287))
+#
+#     await callback_query.answer(f"Вы нажали: {callback_data}")
+#     await next_kb(callback_query.message)
     #os.system('taskkill /f /im chrome.exe')
 
 
 # Ожидание колбэка discord_off
-@dp.callback_query(F.data =='discord_off')
-async def process_discord_callback(callback_query: CallbackQuery):
-    callback_data = callback_query.data
-    cursor.execute("UPDATE users SET discord_on = ? WHERE id = ?", ('False', 5409293287))
-
-    # Удаляем сообщение с кнопками
-    chat_id = callback_query.message.chat.id
-    message_id = callback_query.message.message_id
-    await bot.delete_message(chat_id, message_id)
-
-    await callback_query.answer(f"Вы нажали: {callback_data}")
-    await next_kb(callback_query.message)
-    #os.system('taskkill /f /im chrome.exe')
-    #os.system('taskkill /f /im telegram.exe')
+# @dp.callback_query(F.data =='discord_off')
+# async def process_discord_callback(callback_query: CallbackQuery):
+#     callback_data = callback_query.data
+#     cursor.execute("UPDATE users SET discord_on = ? WHERE id = ?", ('False', 5409293287))
+#
+#     # Удаляем сообщение с кнопками
+#     chat_id = callback_query.message.chat.id
+#     message_id = callback_query.message.message_id
+#     await bot.delete_message(chat_id, message_id)
+#
+#     await callback_query.answer(f"Вы нажали: {callback_data}")
+#     await next_kb(callback_query.message)
+#     #os.system('taskkill /f /im chrome.exe')
+#     #os.system('taskkill /f /im telegram.exe')
 
 
 # Ожидание колбэка run_wot
-@dp.callback_query(F.data == 'run_wot')
-async def game_wot(callback_query: CallbackQuery):
-    callback_data = callback_query.data
-
-    # Удаляем сообщение с кнопками
-    chat_id = callback_query.message.chat.id
-    message_id = callback_query.message.message_id
-    await bot.delete_message(chat_id, message_id)
-
-    run_game_wot()
-    await callback_query.answer('Wot запущен')
+# @dp.callback_query(F.data == 'run_wot')
+# async def game_wot(callback_query: CallbackQuery):
+#     callback_data = callback_query.data
+#
+#     # Удаляем сообщение с кнопками
+#     chat_id = callback_query.message.chat.id
+#     message_id = callback_query.message.message_id
+#     await bot.delete_message(chat_id, message_id)
+#
+#     run_game_wot()
+#     await callback_query.answer('Wot запущен')
 
 
 @dp.callback_query(F.data == 'week_artur')
