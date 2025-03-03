@@ -167,13 +167,18 @@ async def bot_db(message: Message):
 async def bot_indicators_pi(message: Message):
     """Вывод метрик Raspberry Pi в Telegram"""
 
-    metrics = get_rpi_metrics()
-    text = (
-        f"*📟 Raspberry Pi Metrics:*\n"
-        f"🔹 *CPU Usage:* {metrics['cpu_usage']}%\n"
-        f"🔹 *RAM Usage:* {metrics['memory_usage']}%\n"
-        f"🔹 *Temperature:* {metrics['temperature']}°C"
-    )
+    try:
+        metrics = get_rpi_metrics()
+        text = (
+            f"*📟 Raspberry Pi Metrics:*\n"
+            f"🔹 *CPU Usage:* {metrics['cpu_usage']}%\n"
+            f"🔹 *RAM Usage:* {metrics['memory_usage']}%\n"
+            f"🔹 *Disk Usage:* {metrics['disk_usage']}%\n"
+            f"🔹 *Processes:* {metrics['running_processes']}\n"
+            f"🔹 *Temperature:* {metrics['temperature']}°C"
+        )
+    except Exception as e:
+        text = f"❌ Ошибка при получении метрик: {e}"
 
     await message.answer(text, parse_mode="Markdown")
 
