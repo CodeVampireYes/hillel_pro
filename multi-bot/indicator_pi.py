@@ -1,7 +1,9 @@
 import psutil
 import subprocess
+from database import db
+import asyncio
 
-def get_rpi_metrics():
+async def get_rpi_metrics():
     """Получение метрик Raspberry Pi"""
 
     # CPU usage
@@ -30,6 +32,21 @@ def get_rpi_metrics():
     # Number of running processes
     processes = len(psutil.pids())
 
+    # Сохранение метрик в БД
+    try:
+        async with db.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(
+                    """
+                    INSERT INTO rpi_metrics (cpu_usage, memory_usage, disk_usage, temperature, running_processes)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (cpu_usage, memory_usage, disk_usage, cpu_temp, processes)
+                )
+                await conn.commit()  # Сохраняем изменения
+    except Exception as e:
+        print(f"Ошибка при записи в БД: {e}")
+
     return {
         "cpu_usage": cpu_usage,
         "gpu_usage": 0.0,  # GPU usage измерить сложно
@@ -39,8 +56,5 @@ def get_rpi_metrics():
         "running_processes": processes
     }
 
-# Проверка работы
-if __name__ == "__main__":
-    metrics = get_rpi_metrics()
-    for key, value in metrics.items():
-        print(f"{key}: {value}")
+
+
