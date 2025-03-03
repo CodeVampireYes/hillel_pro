@@ -1,18 +1,20 @@
 import psutil
 import subprocess
+import asyncio
 
 async def get_rpi_metrics():
-    """Получение метрик Raspberry Pi"""
+    """Получение метрик Raspberry Pi асинхронно"""
 
-    # CPU usage
-    cpu_usage = psutil.cpu_percent(interval=1)
+    # CPU usage (вызываем в отдельном потоке, чтобы не блокировать asyncio)
+    cpu_usage = await asyncio.to_thread(psutil.cpu_percent, interval=1)
 
     # GPU temperature
+    gpu_temp = 0.0  # Значение по умолчанию
     try:
-        gpu_temp = subprocess.check_output("vcgencmd measure_temp", shell=True).decode().strip()
-        gpu_temp = float(gpu_temp.replace("temp=", "").replace("'C", ""))
+        output = await asyncio.to_thread(subprocess.check_output, "vcgencmd measure_temp", shell=True)
+        gpu_temp = float(output.decode().strip().replace("temp=", "").replace("'C", ""))
     except Exception:
-        gpu_temp = 0.0  # Если ошибка, ставим 0
+        pass  # Оставляем gpu_temp равным 0.0 при ошибке
 
     # Memory usage
     memory_usage = psutil.virtual_memory().percent
@@ -23,12 +25,13 @@ async def get_rpi_metrics():
     # Running processes
     running_processes = len(psutil.pids())
 
-    # CPU temperature
+    # CPU temperature (если не удалось взять CPU temp, используем GPU temp)
+    cpu_temp = gpu_temp
     try:
-        with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
-            cpu_temp = int(f.read().strip()) / 1000.0
-    except FileNotFoundError:
-        cpu_temp = gpu_temp  # Используем GPU temp, если нет доступа
+        async with asyncio.to_thread(open, "/sys/class/thermal/thermal_zone0/temp", "r") as f:
+            cpu_temp = int(await asyncio.to_thread(f.read)) / 1000.0
+    except (FileNotFoundError, ValueError):
+        pass  # Оставляем значение из GPU temp
 
     return {
         "cpu_usage": cpu_usage,
@@ -38,4 +41,3 @@ async def get_rpi_metrics():
         "running_processes": running_processes,
         "temperature": cpu_temp
     }
-
