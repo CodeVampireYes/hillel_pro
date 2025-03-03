@@ -24,10 +24,23 @@ def get_rpi_metrics():
     except FileNotFoundError:
         cpu_temp = gpu_temp  # Используем GPU temp, если нет доступа
 
+    # Disk usage
+    disk_usage = psutil.disk_usage('/').percent
+
+    # Number of running processes
+    processes = len(psutil.pids())
+
     return {
         "cpu_usage": cpu_usage,
         "gpu_usage": 0.0,  # GPU usage измерить сложно
         "memory_usage": memory_usage,
-        "temperature": cpu_temp
+        "disk_usage": disk_usage,
+        "temperature": cpu_temp,
+        "running_processes": processes
     }
 
+# Проверка работы
+if __name__ == "__main__":
+    metrics = get_rpi_metrics()
+    for key, value in metrics.items():
+        print(f"{key}: {value}")
