@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 import mysql.connector
 
 from db import MySQLHelper
@@ -12,25 +12,35 @@ db_config = {
     "database": "tbotdb"
 }
 
-db = MySQLHelper("192.168.100.11", "ar2r", "4505", "tbotdb")
+db = MySQLHelper("192.168.100.11",
+                 "ar2r",
+                 "4505",
+                 "tbotdb")
 db.connect()
 
-users = db.fetch_all("SELECT * FROM system_metrics")
+users = db.fetch_all("SELECT * FROM users")
 print(users)
-
 db.disconnect()
+
+
 @app.route('/')
 def show_tables():
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
+
+        # Показываем таблицы, а не данные пользователя
         cursor.execute("SHOW TABLES")
         tables = [row[0] for row in cursor.fetchall()]
+
         conn.close()
-        return "<br>".join(tables) if tables else "No tables found."
+
+        return render_template('index.html', table=tables)
     except Exception as e:
         return f"Error: {str(e)}"
 
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
+
