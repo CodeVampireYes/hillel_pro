@@ -36,3 +36,6 @@ conn.close()
 
 SHOW COLUMNS FROM имя_таблицы;
 ==
+==
+==
+
