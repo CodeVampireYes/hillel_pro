@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeybo
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from my_config import game_id
-
+from database import db
 
 async def inline_game():
     keyboard = InlineKeyboardBuilder()
@@ -39,3 +39,33 @@ async def year_month():
         x +=1
     return keyboard.adjust(2).as_markup()
 
+
+async def info_db():
+    keyboard = InlineKeyboardBuilder()
+    async with db.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute("""SHOW TABLES;""")
+            tables = await cursor.fetchall()
+            await conn.commit()
+
+    for table in tables:
+        # Извлекаем строку из кортежа. Предполагается, что каждый элемент в tables - это кортеж с одним элементом (название таблицы).
+        table_name = table[0]  # Это первый элемент кортежа (название таблицы)
+        keyboard.add(InlineKeyboardButton(text=table_name, callback_data=f'table_{table_name}'))
+
+    return keyboard.adjust(1).as_markup()
+
+
+async def info_table_users():
+    keyboard = InlineKeyboardBuilder()
+    async with db.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute("""SELECT * FROM users;""")
+            data_table = await cursor.fetchall()
+            print(data_table)
+            await conn.commit()
+    for data in data_table:
+        data_name = data[0]
+        keyboard.add(InlineKeyboardButton(text=data_name, callback_data='data_table_users'))
+
+    return keyboard.adjust(1).as_markup()

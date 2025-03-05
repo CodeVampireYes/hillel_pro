@@ -26,6 +26,7 @@ commands = [
     BotCommand(command="db", description="Data Base"),
     #BotCommand(command="parse", description="Parse"),
     BotCommand(command="indicators_pi", description="indicators_pi"),
+    BotCommand(command="info_db", description="info_db"),
 ]
 
 
@@ -120,6 +121,12 @@ async def on_discord(message: Message):
 @dp.message(Command('week'))
 async def my_week(message: Message):
     await message.reply(text='Выходные:', reply_markup=await kb.my_week())
+    await message.delete()
+
+
+@dp.message(Command('info_db'))
+async def my_week(message: Message):
+    await message.reply(text='Tables:', reply_markup=await kb.info_db())
     await message.delete()
 
 
@@ -301,6 +308,15 @@ async def watch_week_mariia(callback_query: CallbackQuery):
             await conn.commit()
 
     keyboard = await kb.year_month()
+    await callback_query.message.edit_reply_markup(reply_markup=keyboard)
+    await callback_query.answer()
+
+
+@dp.callback_query(F.data =='data_table_users')
+async def show_table_data(callback_query: CallbackQuery):
+    keyboard = await kb.info_table_users()
+
+    # Изменяем сообщение, а не отправляем новое
     await callback_query.message.edit_reply_markup(reply_markup=keyboard)
     await callback_query.answer()
 
