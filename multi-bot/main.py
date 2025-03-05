@@ -70,10 +70,11 @@ async def next_kb(message: Message):
 @dp.message(Command('start'))
 async def start(message: Message):
     user_id = message.from_user.id
-    username = message.from_user.username or "Unknown"  # Если у пользователя нет username
+    username = message.from_user.username or "Unknown"  # If the user doesn't have a username
 
     async with db.pool.acquire() as conn:
         async with conn.cursor() as cursor:
+            # Use ON DUPLICATE KEY UPDATE to prevent duplicate records
             await cursor.execute(
                 """
                 INSERT INTO users (user_id, username) 
@@ -82,9 +83,10 @@ async def start(message: Message):
                 """,
                 (user_id, username)
             )
-            await conn.commit()  # Сохраняем изменения
+            await conn.commit()  # Commit the changes to the database
 
     await message.answer(f'Привет, {username}! С возвращением! 😊')
+
 
 
 
@@ -166,9 +168,23 @@ async def bot_db(message: Message):
 @dp.message(Command("indicators_pi"))
 async def bot_indicators_pi(message: Message):
     """Вывод метрик Raspberry Pi в Telegram"""
-
     try:
         metrics = await get_rpi_metrics()
+
+        # Записываем метрики в базу данных
+        async with db.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(
+                    """
+                    INSERT INTO system_metrics (cpu_usage, memory_usage, disk_usage, running_processes, temperature)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (metrics['cpu_usage'], metrics['memory_usage'], metrics['disk_usage'], metrics['running_processes'],
+                     metrics['temperature'])
+                )
+                await conn.commit()
+
+        # Отправляем метрики пользователю
         text = (
             f"*📟 Raspberry Pi Metrics:*\n"
             f"🔹 *CPU Usage:* {metrics['cpu_usage']}%\n"
@@ -266,7 +282,7 @@ async def watch_week_artur(callback_query: CallbackQuery):
         async with conn.cursor() as cursor:
             await cursor.execute("""
                 UPDATE users
-                SET list_weekend = '1'
+                SET list_weekend = 1
             """)
             await conn.commit()
 
@@ -281,7 +297,7 @@ async def watch_week_mariia(callback_query: CallbackQuery):
         async with conn.cursor() as cursor:
             await cursor.execute("""
                 UPDATE users
-                SET list_weekend = '0'
+                SET list_weekend = 0
             """)
             await conn.commit()
 

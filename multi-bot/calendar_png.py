@@ -1,4 +1,5 @@
 import calendar
+import asyncio
 import matplotlib.pyplot as plt
 from my_calendar import work_calendar_artur, work_calendar_mariia
 from datetime import datetime
@@ -17,10 +18,12 @@ async def generate_calendar(month_number):
         async with conn.cursor() as cursor:
             await cursor.execute('SELECT list_weekend FROM users')
             result = await cursor.fetchone()
-            print(result[0], type(result[0]))
+            print(result, type(result))
             if result[0] == 1:
                 list_weekend = work_calendar_artur
                 who = 'Artur'
+            elif result[0] == None:
+                return "Ошибка: Данные не найдены"
             else:
                 list_weekend = work_calendar_mariia
                 who = 'Mariia'
@@ -89,5 +92,6 @@ async def generate_calendar(month_number):
     plt.close()
 
     return filename
+
 
 
