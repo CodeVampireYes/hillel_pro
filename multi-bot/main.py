@@ -7,7 +7,6 @@ import logging
 
 import keyboards as kb  # Импортируем клавиатуры
 from calendar_png import generate_calendar
-from parser.parser_film import parser_site
 from my_calendar import work_calendar_mariia
 from database import db
 from indicator_pi import get_rpi_metrics
