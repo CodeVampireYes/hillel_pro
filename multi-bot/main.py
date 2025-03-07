@@ -312,11 +312,12 @@ async def watch_week_mariia(callback_query: CallbackQuery):
     await callback_query.answer()
 
 
-@dp.callback_query(F.data =='data_table_users')
+@dp.callback_query(F.data.startswith('table_'))
 async def show_table_data(callback_query: CallbackQuery):
-    keyboard = await kb.info_table_users()
-
-    # Изменяем сообщение, а не отправляем новое
+    if callback_query.data == 'table_users':
+        keyboard = await kb.info_table_users()
+    if callback_query.data == 'table_system_metrics':
+        keyboard = await kb.info_table_system_metrics()
     await callback_query.message.edit_reply_markup(reply_markup=keyboard)
     await callback_query.answer()
 

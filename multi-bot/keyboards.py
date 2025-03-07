@@ -60,12 +60,31 @@ async def info_table_users():
     keyboard = InlineKeyboardBuilder()
     async with db.pool.acquire() as conn:
         async with conn.cursor() as cursor:
-            await cursor.execute("""SELECT * FROM users;""")
+            await cursor.execute("SELECT * FROM users;")
             data_table = await cursor.fetchall()
             print(data_table)
             await conn.commit()
+
     for data in data_table:
         data_name = data[0]
-        keyboard.add(InlineKeyboardButton(text=data_name, callback_data='data_table_users'))
+        print(str(data_name))
+        keyboard.add(InlineKeyboardButton(text=str(data), callback_data=f'user_{data_name}'))
+
+    return keyboard.adjust(1).as_markup()
+
+
+async def info_table_system_metrics():
+    keyboard = InlineKeyboardBuilder()
+    async with db.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute("SELECT * FROM system_metrics;")
+            data_table = await cursor.fetchall()
+            print(data_table)
+            await conn.commit()
+
+    for data in data_table:
+        data_name = data[0]
+        print(str(data_name))
+        keyboard.add(InlineKeyboardButton(text=str(data), callback_data=f'user_{data_name}'))
 
     return keyboard.adjust(1).as_markup()
