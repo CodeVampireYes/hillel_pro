@@ -171,19 +171,21 @@ async def bot_db(message: Message):
 # Фильтр сообщений, которые начинаются с "Привет"
 
 
+
 @dp.message(Command("indicators_pi"))
 async def bot_indicators_pi(message: Message):
     """Вывод метрик Raspberry Pi в Telegram"""
     try:
         metrics = await get_rpi_metrics()
 
-        # Записываем метрики в базу данных
+        # Обновляем метрики в базе данных (предполагается, что есть поле, по которому можно идентифицировать запись)
         async with db.pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(
                     """
-                    INSERT INTO system_metrics (cpu_usage, memory_usage, disk_usage, running_processes, temperature)
-                    VALUES (%s, %s, %s, %s, %s)
+                    UPDATE system_metrics
+                    SET cpu_usage = %s, memory_usage = %s, disk_usage = %s, running_processes = %s, temperature = %s
+                    WHERE id = 1  -- предполагаем, что используем id=1 для актуальной записи
                     """,
                     (metrics['cpu_usage'], metrics['memory_usage'], metrics['disk_usage'], metrics['running_processes'],
                      metrics['temperature'])
@@ -203,6 +205,7 @@ async def bot_indicators_pi(message: Message):
         text = f"❌ Ошибка при получении метрик: {e}"
 
     await message.answer(text, parse_mode="Markdown")
+
 
 
 # @dp.message()
