@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Главная</title>
+</head>
+<body>
+    <h1>Главная страница</h1>
+
+    <h2>Список пользователей</h2>
+    <ul>
+        {% for item in db_users %}
+            <li>
+                ID: {{ item.user_id }} |
+                NAME: {{ item.username }} |
+                DISCORD: {{ item.discord_on }} |
+                DISCORD LINK: {{ item.discord_link }} |
+                DISCORD_LIST(on/off): {{ item.list_weekend }}
+            </li>
+        {% empty %}
+            <li>No users found.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Системные метрики</h2>
+    <ul>
+        {% for item in db_system_metrics %}
+            <li>
+                ID: {{ item.id }} |
+                CPU Usage: {{ item.cpu_usage }} |
+                Memory Usage: {{ item.memory_usage }} |
+                Disk Usage: {{ item.disk_usage }} |
+                Running Processes: {{ item.running_processes }} |
+                Temperature: {{ item.temperature }} |
+                Timestamp: {{ item.timestamp }}
+            </li>
+        {% empty %}
+            <li>No system metrics found.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'about' %}"><button>О нас</button></a>
+</body>
+</html>
