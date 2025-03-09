@@ -346,21 +346,12 @@ async def press_month(callback_query: CallbackQuery):
 
 # Запуск бота
 # ✅ Основная функция запуска
+# Основная функция запуска бота
 async def main():
-    print("⏳ Подключение к базе данных...")
-    await db.connect()  # Подключаем MySQL
-    print("✅ База данных подключена!")
-    await asyncio.gather(
-        periodic_task()  # Фоновая задача
-    )
-    await set_commands(bot)
-
-    try:
-        print("🚀 Бот запущен!")
-        await dp.start_polling(bot)
-    finally:
-        print("❌ Завершаем работу... Закрываем соединение с БД.")
-        await db.close()  # Закрываем MySQL соединение
+    await db.connect()  # Подключаемся к базе данных
+    await set_commands(bot)  # Устанавливаем команды
+    await asyncio.gather(periodic_task())  # Запуск фоновой задачи
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
