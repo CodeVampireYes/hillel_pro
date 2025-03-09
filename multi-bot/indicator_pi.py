@@ -1,6 +1,7 @@
 import psutil
 import subprocess
 import asyncio
+from database import db
 
 async def get_rpi_metrics():
     """Получение метрик Raspberry Pi (асинхронно)"""
@@ -27,11 +28,26 @@ async def get_rpi_metrics():
     except (FileNotFoundError, ValueError):
         pass  # Если ошибка — оставляем GPU temp
 
-    return {
-        "cpu_usage": cpu_usage,
-        "gpu_usage": 0.0,  # GPU usage измерить сложно
-        "memory_usage": memory_usage,
-        "disk_usage": disk_usage,
-        "running_processes": running_processes,
-        "temperature": cpu_temp
-    }
+    async with db.pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            # Вставляем новые данные в базу данных
+            await cursor.execute("""
+                INSERT INTO system_metrics (cpu_usage, memory_usage, disk_usage, running_processes, temperature, timestamp)
+                VALUES (%s, %s, %s, %s, %s, NOW())
+            """, (cpu_usage, memory_usage, disk_usage, running_processes, cpu_temp))
+
+            # Коммитим изменения в базу данных
+            await conn.commit()
+
+
+async def periodic_task():
+    while True:
+        # Вызываем вашу функцию для получения метрик
+        metrics = await get_rpi_metrics()
+
+        # Выводим или логируем метрики (если нужно)
+        print(metrics)
+
+        # Задержка в 20 секунд перед следующим запуском
+        await asyncio.sleep(20)
+
