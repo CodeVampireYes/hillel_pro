@@ -336,7 +336,7 @@ async def main():
     print("⏳ Подключение к базе данных...")
     await db.connect()  # Подключаем MySQL
     print("✅ База данных подключена!")
-    await periodic_task()
+    asyncio.create_task(periodic_task())
     await set_commands(bot)
 
     try:
