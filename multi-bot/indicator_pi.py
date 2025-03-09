@@ -17,7 +17,8 @@ async def get_rpi_metrics():
     try:
         output = await asyncio.to_thread(subprocess.check_output, "vcgencmd measure_temp", shell=True)
         gpu_temp = float(output.decode().strip().replace("temp=", "").replace("'C", ""))
-    except Exception:
+    except Exception as e:
+        print(f"Ошибка при получении температуры GPU: {e}")  # Логируем ошибку
         pass  # Если ошибка — оставляем 0.0
 
     # CPU температура
@@ -25,29 +26,35 @@ async def get_rpi_metrics():
     try:
         temp_raw = await asyncio.to_thread(lambda: open("/sys/class/thermal/thermal_zone0/temp", "r").read().strip())
         cpu_temp = int(temp_raw) / 1000.0
-    except (FileNotFoundError, ValueError):
+    except (FileNotFoundError, ValueError) as e:
+        print(f"Ошибка при получении температуры CPU: {e}")  # Логируем ошибку
         pass  # Если ошибка — оставляем GPU temp
 
+    # Вставляем данные в базу данных
     async with db.pool.acquire() as conn:
         async with conn.cursor() as cursor:
-            # Вставляем новые данные в базу данных
             await cursor.execute("""
                 INSERT INTO system_metrics (cpu_usage, memory_usage, disk_usage, running_processes, temperature, timestamp)
                 VALUES (%s, %s, %s, %s, %s, NOW())
             """, (cpu_usage, memory_usage, disk_usage, running_processes, cpu_temp))
-
-            # Коммитим изменения в базу данных
             await conn.commit()
 
+    # Возвращаем собранные метрики
+    return {
+        "cpu_usage": cpu_usage,
+        "memory_usage": memory_usage,
+        "disk_usage": disk_usage,
+        "running_processes": running_processes,
+        "temperature": cpu_temp
+    }
 
 async def periodic_task():
     while True:
         # Вызываем вашу функцию для получения метрик
         metrics = await get_rpi_metrics()
 
-        # Выводим или логируем метрики (если нужно)
-        print(metrics)
+        # Логируем или выводим метрики
+        print(f"Метрики Raspberry Pi: {metrics}")
 
         # Задержка в 20 секунд перед следующим запуском
         await asyncio.sleep(20)
-
