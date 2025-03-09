@@ -343,15 +343,19 @@ async def press_month(callback_query: CallbackQuery):
     await bot.delete_message(callback_query.message.chat.id, callback_query.message.message_id)
 
 
-
-# Запуск бота
-# ✅ Основная функция запуска
-# Основная функция запуска бота
+# Запуск бота и фоновой задачи
 async def main():
-    await db.connect()  # Подключаемся к базе данных
-    await set_commands(bot)  # Устанавливаем команды
-    await asyncio.gather(periodic_task())  # Запуск фоновой задачи
-    await dp.start_polling(bot)
+    print("⏳ Подключение к базе данных...")
+    await db.connect()  # Подключаем к базе данных
+    print("✅ База данных подключена!")
+
+    # Устанавливаем команды бота
+    await set_commands(bot)
+
+    # Запускаем фоновую задачу и бота параллельно
+    task = asyncio.create_task(periodic_task())  # Фоновая задача
+    await dp.start_polling(bot)  # Основная задача — запуск бота
+
 
 if __name__ == "__main__":
     asyncio.run(main())
