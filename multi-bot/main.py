@@ -350,7 +350,9 @@ async def main():
     print("⏳ Подключение к базе данных...")
     await db.connect()  # Подключаем MySQL
     print("✅ База данных подключена!")
-
+    await asyncio.gather(
+        periodic_task()  # Фоновая задача
+    )
     await set_commands(bot)
 
     try:
@@ -362,4 +364,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-    asyncio.run(periodic_task())
