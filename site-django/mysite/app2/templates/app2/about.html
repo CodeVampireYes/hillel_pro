@@ -1,10 +1,17 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>О нас</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+
 </head>
 <body>
-    <h1>О нас</h1>
-    <a href="{% url 'home' %}"><button>Назад</button></a>
-</body>
-</html>
+    <header class="head">
+        <a href="{% url 'home' %}"><button class="head_button">Home</button></a>
+        <button class="head_button">DB</button>
+        <button class="head_button">About</button>
+    </header>
+    <label>blala</label>
