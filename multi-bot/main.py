@@ -173,23 +173,29 @@ async def bot_db(message: Message):
 
 
 @dp.message(Command("indicators_pi"))
-async def get_metrics_from_db():
-    """Получаем метрики из базы данных."""
+async def get_metrics_from_db(message: Message):
+    """Получаем метрики из базы данных и отправляем их в Telegram."""
     async with db.pool.acquire() as conn:
         async with conn.cursor() as cursor:
+            # Выполняем запрос на получение последних метрик
             await cursor.execute("SELECT * FROM system_metrics ORDER BY timestamp DESC LIMIT 1")
             result = await cursor.fetchone()
 
     if result:
-        return {
-            "cpu_usage": result[1],  # предполагаем, что это значение cpu_usage
-            "memory_usage": result[2],
-            "disk_usage": result[3],
-            "running_processes": result[4],
-            "temperature": result[5]
-        }
+        # Создаем строку с результатами
+        metrics_text = (
+            f"CPU Usage: {result[1]}%\n"
+            f"Memory Usage: {result[2]}%\n"
+            f"Disk Usage: {result[3]}%\n"
+            f"Running Processes: {result[4]}\n"
+            f"Temperature: {result[5]}°C"
+        )
+        # Отправляем метрики пользователю
+        await message.answer(metrics_text)
     else:
-        return None  # если нет данных
+        # Если данных нет, отправляем сообщение о том, что метрики отсутствуют
+        await message.answer("Не удалось получить метрики из базы данных.")
+
 
 
 

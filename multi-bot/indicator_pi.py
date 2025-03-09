@@ -1,8 +1,3 @@
-import psutil
-import subprocess
-import asyncio
-from database import db
-
 async def get_rpi_metrics():
     """Получение метрик Raspberry Pi (асинхронно)"""
 
@@ -18,7 +13,7 @@ async def get_rpi_metrics():
         output = await asyncio.to_thread(subprocess.check_output, "vcgencmd measure_temp", shell=True)
         gpu_temp = float(output.decode().strip().replace("temp=", "").replace("'C", ""))
     except Exception as e:
-        print(f"Ошибка при получении температуры GPU: {e}")  # Логируем ошибку
+        print(f"Ошибка при получении температуры GPU: {e}")
         pass  # Если ошибка — оставляем 0.0
 
     # CPU температура
@@ -27,16 +22,25 @@ async def get_rpi_metrics():
         temp_raw = await asyncio.to_thread(lambda: open("/sys/class/thermal/thermal_zone0/temp", "r").read().strip())
         cpu_temp = int(temp_raw) / 1000.0
     except (FileNotFoundError, ValueError) as e:
-        print(f"Ошибка при получении температуры CPU: {e}")  # Логируем ошибку
+        print(f"Ошибка при получении температуры CPU: {e}")
         pass  # Если ошибка — оставляем GPU temp
 
-    # Вставляем данные в базу данных
+    # Вставляем или обновляем данные в базе данных
     async with db.pool.acquire() as conn:
         async with conn.cursor() as cursor:
+            # Используем INSERT с ON DUPLICATE KEY UPDATE для обновления
             await cursor.execute("""
                 INSERT INTO system_metrics (cpu_usage, memory_usage, disk_usage, running_processes, temperature, timestamp)
                 VALUES (%s, %s, %s, %s, %s, NOW())
+                ON DUPLICATE KEY UPDATE
+                    cpu_usage = VALUES(cpu_usage),
+                    memory_usage = VALUES(memory_usage),
+                    disk_usage = VALUES(disk_usage),
+                    running_processes = VALUES(running_processes),
+                    temperature = VALUES(temperature),
+                    timestamp = NOW()
             """, (cpu_usage, memory_usage, disk_usage, running_processes, cpu_temp))
+
             await conn.commit()
 
     # Возвращаем собранные метрики
@@ -47,14 +51,3 @@ async def get_rpi_metrics():
         "running_processes": running_processes,
         "temperature": cpu_temp
     }
-
-async def periodic_task():
-    while True:
-        # Вызываем вашу функцию для получения метрик
-        metrics = await get_rpi_metrics()
-
-        # Логируем или выводим метрики
-        print(f"Метрики Raspberry Pi: {metrics}")
-
-        # Задержка в 20 секунд перед следующим запуском
-        await asyncio.sleep(20)
