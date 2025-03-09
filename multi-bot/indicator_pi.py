@@ -30,22 +30,15 @@ async def get_rpi_metrics():
         print(f"Ошибка при получении температуры CPU: {e}")
         pass  # Если ошибка — оставляем GPU temp
 
-    # Вставляем или обновляем данные в базе данных
+    # Обновляем данные в базе данных (используем UPDATE, чтобы обновить последние метрики)
     async with db.pool.acquire() as conn:
         async with conn.cursor() as cursor:
-            # Используем INSERT с ON DUPLICATE KEY UPDATE для обновления
             await cursor.execute("""
-                INSERT INTO system_metrics (cpu_usage, memory_usage, disk_usage, running_processes, temperature, timestamp)
-                VALUES (%s, %s, %s, %s, %s, NOW())
-                ON DUPLICATE KEY UPDATE
-                    cpu_usage = VALUES(cpu_usage),
-                    memory_usage = VALUES(memory_usage),
-                    disk_usage = VALUES(disk_usage),
-                    running_processes = VALUES(running_processes),
-                    temperature = VALUES(temperature),
-                    timestamp = NOW()
+                UPDATE system_metrics
+                SET cpu_usage = %s, memory_usage = %s, disk_usage = %s, 
+                    running_processes = %s, temperature = %s, timestamp = NOW()
+                WHERE id = 1  -- Обновляем строку с id = 1 (или используйте свой идентификатор)
             """, (cpu_usage, memory_usage, disk_usage, running_processes, cpu_temp))
-
             await conn.commit()
 
     # Возвращаем собранные метрики
@@ -56,4 +49,15 @@ async def get_rpi_metrics():
         "running_processes": running_processes,
         "temperature": cpu_temp
     }
+
+async def periodic_task():
+    while True:
+        # Вызываем функцию для получения метрик
+        metrics = await get_rpi_metrics()
+
+        # Логируем или выводим метрики
+        print(f"Метрики Raspberry Pi: {metrics}")
+
+        # Задержка в 20 секунд перед следующим запуском
+        await asyncio.sleep(20)  # Задержка 20 секунд между выполнениями
 

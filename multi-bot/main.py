@@ -9,7 +9,7 @@ import keyboards as kb  # Импортируем клавиатуры
 from calendar_png import generate_calendar
 from my_calendar import work_calendar_mariia
 from database import db
-from indicator_pi import get_rpi_metrics, periodic_task
+from indicator_pi import get_rpi_metrics
 
 import os
 
@@ -173,30 +173,38 @@ async def bot_db(message: Message):
 
 
 @dp.message(Command("indicators_pi"))
-async def get_metrics_from_db(message: Message):
-    """Получаем метрики из базы данных и отправляем их в Telegram."""
-    async with db.pool.acquire() as conn:
-        async with conn.cursor() as cursor:
-            # Выполняем запрос на получение последних метрик
-            await cursor.execute("SELECT * FROM system_metrics ORDER BY timestamp DESC LIMIT 1")
-            result = await cursor.fetchone()
+async def bot_indicators_pi(message: Message):
+    """Вывод метрик Raspberry Pi в Telegram"""
+    try:
+        metrics = await get_rpi_metrics()
 
-    if result:
-        # Создаем строку с результатами
-        metrics_text = (
-            f"CPU Usage: {result[1]}%\n"
-            f"Memory Usage: {result[2]}%\n"
-            f"Disk Usage: {result[3]}%\n"
-            f"Running Processes: {result[4]}\n"
-            f"Temperature: {result[5]}°C"
-        )
+        # Обновляем метрики в базе данных (предполагается, что есть поле, по которому можно идентифицировать запись)
+        async with db.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(
+                    """
+                    UPDATE system_metrics
+                    SET cpu_usage = %s, memory_usage = %s, disk_usage = %s, running_processes = %s, temperature = %s
+                    WHERE id = 1  -- предполагаем, что используем id=1 для актуальной записи
+                    """,
+                    (metrics['cpu_usage'], metrics['memory_usage'], metrics['disk_usage'], metrics['running_processes'],
+                     metrics['temperature'])
+                )
+                await conn.commit()
+
         # Отправляем метрики пользователю
-        await message.answer(metrics_text)
-    else:
-        # Если данных нет, отправляем сообщение о том, что метрики отсутствуют
-        await message.answer("Не удалось получить метрики из базы данных.")
+        text = (
+            f"*📟 Raspberry Pi Metrics:*\n"
+            f"🔹 *CPU Usage:* {metrics['cpu_usage']}%\n"
+            f"🔹 *RAM Usage:* {metrics['memory_usage']}%\n"
+            f"🔹 *Disk Usage:* {metrics['disk_usage']}%\n"
+            f"🔹 *Processes:* {metrics['running_processes']}\n"
+            f"🔹 *Temperature:* {metrics['temperature']}°C"
+        )
+    except Exception as e:
+        text = f"❌ Ошибка при получении метрик: {e}"
 
-
+    await message.answer(text, parse_mode="Markdown")
 
 
 
@@ -342,7 +350,7 @@ async def main():
     print("⏳ Подключение к базе данных...")
     await db.connect()  # Подключаем MySQL
     print("✅ База данных подключена!")
-    asyncio.create_task(periodic_task())
+
     await set_commands(bot)
 
     try:
