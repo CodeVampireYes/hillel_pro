@@ -50,6 +50,7 @@ async def get_rpi_metrics():
         "temperature": cpu_temp
     }
 
+
 async def periodic_task():
     while True:
         # Вызываем функцию для получения метрик

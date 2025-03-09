@@ -9,7 +9,7 @@ import keyboards as kb  # Импортируем клавиатуры
 from calendar_png import generate_calendar
 from my_calendar import work_calendar_mariia
 from database import db
-from indicator_pi import get_rpi_metrics
+from indicator_pi import get_rpi_metrics, periodic_task
 
 import os
 
@@ -362,5 +362,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-# pyinstaller --onefile main.py
+    asyncio.run(periodic_task())
