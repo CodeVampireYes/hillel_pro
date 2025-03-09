@@ -1,3 +1,8 @@
+import psutil
+import subprocess
+import asyncio
+from database import db
+
 async def get_rpi_metrics():
     """Получение метрик Raspberry Pi (асинхронно)"""
 
@@ -51,3 +56,4 @@ async def get_rpi_metrics():
         "running_processes": running_processes,
         "temperature": cpu_temp
     }
+
