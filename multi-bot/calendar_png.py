@@ -18,13 +18,12 @@ async def generate_calendar(month_number):
         async with conn.cursor() as cursor:
             await cursor.execute('SELECT list_weekend FROM users')
             result = await cursor.fetchone()
-            print(result, type(result))
 
-            # Проверка, если данных нет или поле None
+            print(f"Полученные данные из базы: {result}")  # Отладочное сообщение
+
             if not result or result[0] is None:
                 return "Ошибка: Данные не найдены"
 
-            # Логика выбора календаря
             if result[0] == 1:
                 list_weekend = work_calendar_artur
                 who = 'Artur'
