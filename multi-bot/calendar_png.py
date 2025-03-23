@@ -19,15 +19,18 @@ async def generate_calendar(month_number):
             await cursor.execute('SELECT list_weekend FROM users')
             result = await cursor.fetchone()
             print(result, type(result))
+
+            # Проверка, если данных нет или поле None
+            if not result or result[0] is None:
+                return "Ошибка: Данные не найдены"
+
+            # Логика выбора календаря
             if result[0] == 1:
                 list_weekend = work_calendar_artur
                 who = 'Artur'
-            elif result[0] == None:
-                return "Ошибка: Данные не найдены"
             else:
                 list_weekend = work_calendar_mariia
                 who = 'Mariia'
-
 
     year = 2025  # Можно заменить на текущий год
     cal = calendar.monthcalendar(year, month_number)
