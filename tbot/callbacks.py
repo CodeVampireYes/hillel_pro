@@ -69,3 +69,10 @@ async def show_pi5_metrics_btn(callback: CallbackQuery):
     keyboard = await kb.show_pi5_btn()
     await callback.message.edit_text('Pi5: ', reply_markup=keyboard)
     await callback.answer()
+
+
+@router.callback_query(F.data == "show_pi5_metrics")
+async def show_pi5_metrics_btn(callback: CallbackQuery):
+    result = pi5.cpu_temp()
+    await callback.message.edit_text(result)
+    await callback.answer()
