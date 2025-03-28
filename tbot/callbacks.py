@@ -3,6 +3,7 @@ from aiogram.types import CallbackQuery
 from db import get_token_setting_tbot
 
 import keyboards as kb
+from utils import pi5
 
 import aiosqlite
 
@@ -64,6 +65,7 @@ async def callback_show_db_users_username_btn(callback: CallbackQuery):
 
 @router.callback_query(F.data == "show_pi5")
 async def show_pi5_metrics_btn(callback: CallbackQuery):
+    await pi5.cpu_temp()
     keyboard = await kb.show_pi5_btn()
     await callback.message.edit_text('Pi5: ', reply_markup=keyboard)
     await callback.answer()
