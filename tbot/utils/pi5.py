@@ -15,15 +15,25 @@ def get_metrics_pi5():
 
     def ssd_temp():
         result = subprocess.run(['sudo', 'nvme', 'smart-log', '/dev/nvme0', '|', 'grep temperature'], capture_output=True, text=True)
-        return result.stdout.strip().replace("""CompletedProcess(args=['sudo', 'nvme', 'smart-log', '/dev/nvme0', '|',
-         'grep temperature'], returncode=0, stdout='Smart Log for NVME device:nvme0 
-         namespace-id:ffffffff\ncritical_warning\t\t\t: 0\ntemperature\t\t\t\t: 33°C (306 Kelvin)\navailable_spare\t\t\t\t:
-          100%\navailable_spare_threshold\t\t: 10%\npercentage_used\t\t\t\t: 0%\nendurance group critical warning
-           summary: 0\nData Units Read\t\t\t\t: 44,083 (22.57 GB)\nData Units Written\t\t\t:
-            593,883 (304.07 GB)\nhost_read_commands\t\t\t: 433,287\nhost_write_commands\t\t\t:
-             1,859,791\ncontroller_busy_time\t\t\t: 13\npower_cycles\t\t\t\t: 67\npower_on_hours\t\t\t\t:
-              3\nunsafe_shutdowns\t\t\t: 44\nmedia_errors\t\t\t\t: 0\nnum_err_log_entries\t\t\t: 0\nWarning Temperature
-               Time\t\t: 0\nCritical Composite Temperature Time\t: 0\n""", '')
+        return result.stdout.strip().replace("""Smart Log for NVME device:nvme0 namespace-id:ffffffff
+                                                        critical_warning   : 0
+                                                        temperature    : 34°C (307 Kelvin)
+                                                        available_spare    : 100%
+                                                        available_spare_threshold  : 10%
+                                                        percentage_used    : 0%
+                                                        endurance group critical warning summary: 0
+                                                        Data Units Read    : 44,083 (22.57 GB)
+                                                        Data Units Written   : 593,884 (304.07 GB)
+                                                        host_read_commands   : 433,287
+                                                        host_write_commands   : 1,859,842
+                                                        controller_busy_time   : 13
+                                                        power_cycles    : 67
+                                                        power_on_hours    : 3
+                                                        unsafe_shutdowns   : 44
+                                                        media_errors    : 0
+                                                        num_err_log_entries   : 0
+                                                        Warning Temperature Time  : 0
+                                                        Critical Composite Temperature Time : 0""", '')
 
     return str(f"""
     CPU: {cpu_temp()}°C | {cpu_usage()}%
