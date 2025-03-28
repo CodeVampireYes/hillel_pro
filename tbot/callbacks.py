@@ -65,7 +65,6 @@ async def callback_show_db_users_username_btn(callback: CallbackQuery):
 
 @router.callback_query(F.data == "show_pi5")
 async def show_pi5_metrics_btn(callback: CallbackQuery):
-    pi5.cpu_temp()
     keyboard = await kb.show_pi5_btn()
     await callback.message.edit_text('Pi5: ', reply_markup=keyboard)
     await callback.answer()
@@ -74,5 +73,6 @@ async def show_pi5_metrics_btn(callback: CallbackQuery):
 @router.callback_query(F.data == "show_pi5_metrics")
 async def show_pi5_metrics_btn(callback: CallbackQuery):
     result = pi5.cpu_temp()
-    await callback.message.edit_text(result)
+    result1 = pi5.cpu_temp()
+    await callback.message.edit_text(result, result1)
     await callback.answer()
