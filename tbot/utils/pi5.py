@@ -15,25 +15,10 @@ def get_metrics_pi5():
 
     def ssd_temp():
         result = subprocess.run(['sudo', 'nvme', 'smart-log', '/dev/nvme0', '|', 'grep temperature'], capture_output=True, text=True)
-        return result.stdout.strip().replace("""Smart Log for NVME device:nvme0 namespace-id:ffffffff
-                                                        critical_warning   : 0
-                                                        temperature    : 34°C (307 Kelvin)
-                                                        available_spare    : 100%
-                                                        available_spare_threshold  : 10%
-                                                        percentage_used    : 0%
-                                                        endurance group critical warning summary: 0
-                                                        Data Units Read    : 44,083 (22.57 GB)
-                                                        Data Units Written   : 593,884 (304.07 GB)
-                                                        host_read_commands   : 433,287
-                                                        host_write_commands   : 1,859,842
-                                                        controller_busy_time   : 13
-                                                        power_cycles    : 67
-                                                        power_on_hours    : 3
-                                                        unsafe_shutdowns   : 44
-                                                        media_errors    : 0
-                                                        num_err_log_entries   : 0
-                                                        Warning Temperature Time  : 0
-                                                        Critical Composite Temperature Time : 0""", '')
+        for line in result.stdout.split("\n"):
+            if "temperature" in line.lower() and "sensor" not in line:  # Ищем общую температуру, без сенсоров
+                temp_value = line.split(":")[1].strip().split("°")[0]  # Извлекаем число
+                return int(temp_value)
 
     return str(f"""
     CPU: {cpu_temp()}°C | {cpu_usage()}%
