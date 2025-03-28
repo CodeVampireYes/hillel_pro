@@ -13,8 +13,14 @@ def get_metrics_pi5():
         mem = psutil.virtual_memory()
         return mem.used / (1024 ** 2)
 
+    def ssd_temp():
+        result = subprocess.run(['sudo', 'nvme', 'smart-log', '/dev/nvme0', '|', 'grep temperature'], capture_output=True, text=True)
+        return result
+
     return str(f"""
     CPU: {cpu_temp()}°C | {cpu_usage()}%
+    RAM: {ram_usage():.2f} MB
+    SSD: {ssd_temp()}
     """)
 
 
