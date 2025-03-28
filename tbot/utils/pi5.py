@@ -7,4 +7,9 @@ def get_metrics_pi5():
         return result.stdout.strip().startswith('temp=', '')
 
 
+    return str(f"""
+    CPU: {cpu_temp()}
+    """)
+
+
 
