@@ -15,7 +15,7 @@ router = Router()  # Используем Router для удобной реги�
 @router.callback_query(F.data == "show_db")
 async def callback_show_db_btn(callback: CallbackQuery):
     keyboard = await kb.show_db_btn()
-    await callback.message.edit_text('DB Menu: ', reply_markup=keyboard)
+    await callback.message.edit_text('          DB Menu          ', reply_markup=keyboard)
     await callback.answer()
 
 
@@ -29,7 +29,7 @@ async def callback_show_db__users_btn(callback: CallbackQuery):
 @router.callback_query(F.data == "back_show_menu")
 async def callback_show_menu_btn(callback: CallbackQuery):
     keyboard = await kb.show_start_btn()
-    await callback.message.edit_text('Menu: ', reply_markup=keyboard)
+    await callback.message.edit_text('           Menu:            ', reply_markup=keyboard)
     await callback.answer()
 
 
@@ -41,7 +41,7 @@ async def callback_show_db_users_btn(callback: CallbackQuery):
         await db.commit()
 
     keyboard = await kb.show_db_users_username_btn(all_users)
-    await callback.message.edit_text('Name users: ', reply_markup=keyboard)
+    await callback.message.edit_text('        Name users:        ', reply_markup=keyboard)
     await callback.answer()
 
 
@@ -67,7 +67,7 @@ async def callback_show_db_users_username_btn(callback: CallbackQuery):
 @router.callback_query(F.data == "show_pi5")
 async def show_pi5_metrics_btn(callback: CallbackQuery):
     keyboard = await kb.show_pi5_btn()
-    await callback.message.edit_text('Pi5: ', reply_markup=keyboard)
+    await callback.message.edit_text('             Pi5:             ', reply_markup=keyboard)
     await callback.answer()
 
 
