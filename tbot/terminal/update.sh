@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Navigate to the project directory
 cd /mnt/ssd2/hillel_pro || exit
 
@@ -16,7 +18,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 sudo systemctl restart tbot.service
-
 
 # Print success message
 echo "? Bot successfully updated and restarted!"
