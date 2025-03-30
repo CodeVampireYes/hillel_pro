@@ -40,6 +40,7 @@ async def show_pi5_btn():
     keyboard = InlineKeyboardBuilder()
     keyboard.add(InlineKeyboardButton(text='Состояние Pi5', callback_data="show_pi5_metrics"))
     keyboard.add(InlineKeyboardButton(text='Reboot', callback_data="show_pi5_reboot"))
+    keyboard.add(InlineKeyboardButton(text='Update', callback_data="show_pi5_update"))
     keyboard.add(InlineKeyboardButton(text='🔙 Back', callback_data="back_show_menu"))
     return keyboard.adjust(1).as_markup()
 

@@ -6,6 +6,7 @@ import keyboards as kb
 from utils import pi5
 
 import aiosqlite
+import subprocess
 
 
 router = Router()  # Используем Router для удобной регистрации обработчиков
@@ -75,4 +76,20 @@ async def show_pi5_metrics_btn(callback: CallbackQuery):
     result = pi5.get_metrics_pi5()
 
     await callback.message.edit_text(result)
+    await callback.answer()
+
+
+@router.callback_query(F.data == "show_pi5_update")
+async def show_pi5_metrics_btn(callback: CallbackQuery):
+    await callback.message.answer("🔄 Начинаю обновление бота...")
+
+    result = subprocess.run(
+        ["/mnt/ssd2/hillel_pro/tbot/update.sh"],
+        capture_output=True,
+        text=True
+    )
+
+    await callback.message.answer(f"✅ Обновление завершено!\n\n{result.stdout or result.stderr}")
+
+    # Закрываем инлайн-уведомление (чтобы не висело)
     await callback.answer()
