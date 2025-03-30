@@ -15,5 +15,8 @@ source venv/bin/activate
 # Install required dependencies
 pip install -r requirements.txt
 
+sudo systemctl restart tbot.service
+
+
 # Print success message
 echo "? Bot successfully updated and restarted!"
