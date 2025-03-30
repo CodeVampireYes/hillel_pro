@@ -88,8 +88,6 @@ async def show_pi5_metrics_btn(callback: CallbackQuery):
         capture_output=True,
         text=True
     )
-
     await callback.message.answer(f"✅ Обновление завершено!")
-
     # Закрываем инлайн-уведомление (чтобы не висело)
     await callback.answer()
