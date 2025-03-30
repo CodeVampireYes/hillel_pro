@@ -93,15 +93,31 @@ async def show_pi5_metrics_btn(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.callback_query(F.data == "show_pi5_reboot")
+@router.callback_query(Text(data="show_pi5_reboot"))
 async def show_pi5_metrics_btn(callback: CallbackQuery):
     await callback.message.answer("🔄 Начинаю перезагрузку...")
 
-    result = subprocess.run(
-        ["/mnt/ssd2/hillel_pro/tbot/terminal/reboot_pi5.sh"],
-        capture_output=True,
-        text=True
-    )
-    await callback.message.answer(f"✅ Перезагрузка прошла успешно!")
-    # Закрываем инлайн-уведомление (чтобы не висело)
+    try:
+        # Выполняем скрипт
+        result = subprocess.run(
+            ["/mnt/ssd2/hillel_pro/tbot/terminal/reboot_pi5.sh"],
+            capture_output=True,
+            text=True,
+            check=True  # Поднимет исключение в случае ошибки
+        )
+        # Проверяем результат выполнения
+        if result.returncode == 0:
+            await callback.message.answer("✅ Перезагрузка прошла успешно!")
+        else:
+            await callback.message.answer(f"⚠️ Ошибка при перезагрузке: {result.stderr}")
+
+    except subprocess.CalledProcessError as e:
+        # Обработка ошибок
+        await callback.message.answer(f"❌ Ошибка при выполнении скрипта: {e}")
+
+    except Exception as e:
+        # Обработка других непредвиденных ошибок
+        await callback.message.answer(f"❌ Произошла непредвиденная ошибка: {e}")
+
+    # Закрываем инлайн-уведомление
     await callback.answer()
