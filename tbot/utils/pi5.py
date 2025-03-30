@@ -2,6 +2,7 @@ import subprocess
 import psutil
 import os
 
+
 def get_metrics_pi5():
     def cpu_temp():
         result = subprocess.run(['vcgencmd', 'measure_temp'], capture_output=True, text=True)
@@ -29,9 +30,9 @@ def get_metrics_pi5():
             return "SSD не подключен"
 
     return str(f"""
-    CPU: {cpu_temp()}°C | {cpu_usage()}%
-    RAM: {ram_usage():.2f} MB
-    SSD: {ssd_temp()}°C | {ssd_usage()}%
+    🤖 CPU: {cpu_temp()}°C | {cpu_usage()}%
+    ⚡ RAM: {ram_usage():.2f} MB
+    💾 SSD: {ssd_temp()}°C | {ssd_usage()}%
     """)
 
 
