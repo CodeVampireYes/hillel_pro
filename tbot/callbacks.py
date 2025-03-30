@@ -93,7 +93,7 @@ async def show_pi5_metrics_btn(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.callback_query(Text(data="show_pi5_reboot"))
+@router.callback_query(F.data == "show_pi5_reboot")
 async def show_pi5_metrics_btn(callback: CallbackQuery):
     await callback.message.answer("🔄 Начинаю перезагрузку...")
 
