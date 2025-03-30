@@ -84,10 +84,24 @@ async def show_pi5_metrics_btn(callback: CallbackQuery):
     await callback.message.answer("🔄 Начинаю обновление бота...")
 
     result = subprocess.run(
-        ["/mnt/ssd2/hillel_pro/tbot/update.sh"],
+        ["/mnt/ssd2/hillel_pro/tbot/terminal/update.sh"],
         capture_output=True,
         text=True
     )
     await callback.message.answer(f"✅ Обновление завершено!")
+    # Закрываем инлайн-уведомление (чтобы не висело)
+    await callback.answer()
+
+
+@router.callback_query(F.data == "show_pi5_reboot")
+async def show_pi5_metrics_btn(callback: CallbackQuery):
+    await callback.message.answer("🔄 Начинаю перезагрузку...")
+
+    result = subprocess.run(
+        ["/mnt/ssd2/hillel_pro/tbot/terminal/reboot_pi5.sh"],
+        capture_output=True,
+        text=True
+    )
+    await callback.message.answer(f"✅ Перезагрузка прошла успешно!")
     # Закрываем инлайн-уведомление (чтобы не висело)
     await callback.answer()
