@@ -57,6 +57,7 @@ async def generate_calendar(number_month):
     async with aiosqlite.connect('example.db') as db:
         async with db.execute("SELECT create_calendar FROM setting_tbot") as cursor:
             username_calendar = await cursor.fetchone()
+            print(username_calendar[0])
         await db.commit()
 
         if username_calendar[0] == 'artur':

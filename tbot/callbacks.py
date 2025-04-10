@@ -169,20 +169,9 @@ async def show_schedule_artur_btn(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.callback_query(F.data.startswith('month'))
-async def show_schedule_mariia_btn(callback: CallbackQuery):
-    async with aiosqlite.connect('example.db') as db:
-        await db.execute("UPDATE setting_tbot SET create_calendar = ? WHERE id = 1", ('mariia',))
-        await db.commit()
-
-    keyboard = await kb.show_schedule_month_btn()
-    await callback.message.edit_text('Календарь для Марии', reply_markup=keyboard)
-    await callback.answer()
-
-
-@router.callback_query(F.data.startswith('month'))
+@router.callback_query(F.data.startswith('month_'))
 async def press_month(callback_query: CallbackQuery):
-    number_month = int(callback_query.data.replace('month', ''))
+    number_month = int(callback_query.data.replace('month_', ''))
 
     await callback_query.message.edit_reply_markup(reply_markup=None)
     # Используем await для генерации календаря
@@ -194,27 +183,47 @@ async def press_month(callback_query: CallbackQuery):
     await callback_query.answer()
 
 
-@router.callback_query(F.data.startswith('show_app_'))
+@router.callback_query(F.data == 'show_app')
 async def press_month(callback_query: CallbackQuery):
-    name_app = str(callback_query.data.replace('show_app_', ''))
+    keyboard = await kb.show_app_btn()
 
-    if name_app == 'tbot':
-        keyboard = await kb.show_app_tbot_update()
-    else:
-        print(name_app)
-
+    await callback_query.message.edit_text('My app', reply_markup=keyboard)
     await callback_query.answer()
 
 
-@router.callback_query(F.data == "show_app_tbot_update")
-async def show_app_tbot_update_btn(callback: CallbackQuery):
-    await callback.message.answer("🔄 Начинаю обновление бота...")
+@router.callback_query(F.data == 'show_app_tbot')
+async def press_month(callback_query: CallbackQuery):
+    keyboard = await kb.show_app_tbot_update()
 
-    result = subprocess.run(
-        ["/mnt/ssd2/hillel_pro/tbot/terminal/update.sh"],
-        capture_output=True,
-        text=True
-    )
-    await callback.message.answer(f"✅ Обновление завершено!")
-    # Закрываем инлайн-уведомление (чтобы не висело)
+    await callback_query.message.edit_text('tbot', reply_markup=keyboard)
+    await callback_query.answer()
+
+
+@router.callback_query(F.data == "show_tbot_app_update")
+async def show_app_tbot_update_btn(callback: CallbackQuery):
+    await callback.message.answer("🔄 Начинаю перезагрузку...")
+
+    try:
+        # Выполняем скрипт
+        result = subprocess.run(
+            ["/mnt/ssd2/hillel_pro/tbot/terminal/reboot_pi5.sh"],
+            capture_output=True,
+            text=True,
+            check=True  # Поднимет исключение в случае ошибки
+        )
+        # Проверяем результат выполнения
+        if result.returncode == 0:
+            await callback.message.answer("✅ Перезагрузка прошла успешно!")
+        else:
+            await callback.message.answer(f"⚠️ Ошибка при перезагрузке: {result.stderr}")
+
+    except subprocess.CalledProcessError as e:
+        # Обработка ошибок
+        await callback.message.answer(f"❌ Ошибка при выполнении скрипта: {e}")
+
+    except Exception as e:
+        # Обработка других непредвиденных ошибок
+        await callback.message.answer(f"❌ Произошла непредвиденная ошибка: {e}")
+
+    # Закрываем инлайн-уведомление
     await callback.answer()

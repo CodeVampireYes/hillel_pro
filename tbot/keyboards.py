@@ -62,7 +62,7 @@ async def show_schedule_month_btn():
     num_month = 1
     keyboard = InlineKeyboardBuilder()
     for month in year:
-        keyboard.add(InlineKeyboardButton(text=month, callback_data=f'month{num_month}'))
+        keyboard.add(InlineKeyboardButton(text=month, callback_data=f'month_{num_month}'))
         num_month += 1
     return keyboard.adjust(2).as_markup()
 
@@ -78,6 +78,7 @@ async def show_app_btn():
 
 async def show_app_tbot_update():
     keyboard = InlineKeyboardBuilder()
-    keyboard.add(InlineKeyboardButton(text='Update', callback_data=f"show_app_tbot_update"))
+    keyboard.add(InlineKeyboardButton(text='Update', callback_data=f"show_tbot_app_update"))
+    keyboard.add(InlineKeyboardButton(text='🔙 Back', callback_data="show_app"))
 
     return keyboard.adjust(1).as_markup()
