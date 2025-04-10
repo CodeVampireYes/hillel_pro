@@ -201,29 +201,13 @@ async def press_month(callback_query: CallbackQuery):
 
 @router.callback_query(F.data == "show_tbot_app_update")
 async def show_app_tbot_update_btn(callback: CallbackQuery):
-    await callback.message.answer("🔄 Начинаю перезагрузку...")
+    await callback.message.answer("🔄 Начинаю обновление бота...")
 
-    try:
-        # Выполняем скрипт
-        result = subprocess.run(
-            ["/mnt/ssd2/hillel_pro/tbot/terminal/reboot_pi5.sh"],
-            capture_output=True,
-            text=True,
-            check=True  # Поднимет исключение в случае ошибки
-        )
-        # Проверяем результат выполнения
-        if result.returncode == 0:
-            await callback.message.answer("✅ Перезагрузка прошла успешно!")
-        else:
-            await callback.message.answer(f"⚠️ Ошибка при перезагрузке: {result.stderr}")
-
-    except subprocess.CalledProcessError as e:
-        # Обработка ошибок
-        await callback.message.answer(f"❌ Ошибка при выполнении скрипта: {e}")
-
-    except Exception as e:
-        # Обработка других непредвиденных ошибок
-        await callback.message.answer(f"❌ Произошла непредвиденная ошибка: {e}")
-
-    # Закрываем инлайн-уведомление
+    result = subprocess.run(
+        ["/mnt/ssd2/hillel_pro/tbot/terminal/update.sh"],
+        capture_output=True,
+        text=True
+    )
+    await callback.message.answer(f"✅ Обновление завершено!")
+    # Закрываем инлайн-уведомление (чтобы не висело)
     await callback.answer()
