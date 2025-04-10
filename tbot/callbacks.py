@@ -121,3 +121,10 @@ async def show_pi5_metrics_btn(callback: CallbackQuery):
 
     # Закрываем инлайн-уведомление
     await callback.answer()
+
+
+@router.callback_query(F.data == "show_schedule")
+async def show_pi5_metrics_btn(callback: CallbackQuery):
+    keyboard = await kb.show_schedule_btn()
+    await callback.message.edit_text('График для:', reply_markup=keyboard)
+    await callback.answer()
