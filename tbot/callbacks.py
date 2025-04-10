@@ -172,15 +172,13 @@ async def show_schedule_artur_btn(callback: CallbackQuery):
 @router.callback_query(F.data.startswith('month'))
 async def press_month(callback_query: CallbackQuery):
     number_month = int(callback_query.data.replace('month', ''))
-    async with aiosqlite.connect('example.db') as db:
-        async with db.execute("SELECT create_calendar FROM setting_tbot") as cursor:
-            username_calendar = await cursor.fetchone()
-        await db.commit()
 
+    await callback_query.message.edit_reply_markup(reply_markup=None)
     # Используем await для генерации календаря
-    filename = await generate_calendar(number_month, username_calendar)
+    filename = await generate_calendar(number_month)
 
     photo = FSInputFile(filename)
     await callback_query.message.answer_photo(photo)
 
     await callback_query.answer()
+

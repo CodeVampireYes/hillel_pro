@@ -8,7 +8,7 @@ async def init_db_setting_tbot():
             CREATE TABLE IF NOT EXISTS setting_tbot (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 token TEXT NOT NULL,
-                create_calendar TEXT
+                create_calendar TEXT DEFAULT ''
             )
         """)
         await db.commit()
@@ -20,18 +20,6 @@ async def get_token_setting_tbot(record_id: int):
         async with db.execute('SELECT token FROM setting_tbot WHERE id = ?', (record_id,)) as cursor:
             row = await cursor.fetchone()
             return row[0] if row else None
-
-######
-
-#Вставка или обновление (INSERT OR REPLACE)
-#query = "INSERT OR REPLACE INTO setting_tbot (id, token) VALUES (?, ?)"
-#params = (2, "2",)
-######
-
-# Удаляем запись с ID = 5
-#query = "DELETE FROM setting_tbot WHERE id = ?"
-#params = (2,)
-######
 
 
 async def init_db_users():
