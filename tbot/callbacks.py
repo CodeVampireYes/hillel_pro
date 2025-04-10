@@ -42,9 +42,9 @@ async def show_db_setting_tbot(callback: CallbackQuery):
         await db.commit()
 
     await callback.message.edit_text(f"""
-        id: {data[0]}
-        token: {data[1]}
-        create_calendar: {data[2]}
+        id: {data[0][0]}
+        token: {data[0][1]}
+        create_calendar: {data[0][2]}
         
         """)
     await callback.answer()
