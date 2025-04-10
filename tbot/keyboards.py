@@ -6,6 +6,7 @@ async def show_start_btn():
     keyboard = InlineKeyboardBuilder()
     keyboard.add(InlineKeyboardButton(text='🖥️ Pi5', callback_data="show_pi5"))
     keyboard.add(InlineKeyboardButton(text='🗄️ DB', callback_data="show_db"))
+    keyboard.add(InlineKeyboardButton(text='📅 График', callback_data="show_schedule"))
     return keyboard.adjust(1).as_markup()
 
 
@@ -43,5 +44,13 @@ async def show_pi5_btn():
     keyboard.add(InlineKeyboardButton(text='🛠️ Update', callback_data="show_pi5_update"))
     keyboard.add(InlineKeyboardButton(text='🔙 Back', callback_data="back_show_menu"))
     return keyboard.adjust(1).as_markup()
+
+
+async def show_schedule_btn():
+    keyboard = InlineKeyboardBuilder()
+    keyboard.add(InlineKeyboardButton(text='Мария', callback_data="show_schedule_mariia"))
+    keyboard.add(InlineKeyboardButton(text='Артур', callback_data="show_schedule_artur"))
+    keyboard.add(InlineKeyboardButton(text='Совместные', callback_data="show_schedule_together"))
+    keyboard.add(InlineKeyboardButton(text='🔙 Back', callback_data="back_show_menu"))
 
 
