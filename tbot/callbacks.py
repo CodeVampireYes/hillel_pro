@@ -170,6 +170,17 @@ async def show_schedule_artur_btn(callback: CallbackQuery):
 
 
 @router.callback_query(F.data.startswith('month'))
+async def show_schedule_mariia_btn(callback: CallbackQuery):
+    async with aiosqlite.connect('example.db') as db:
+        await db.execute("UPDATE setting_tbot SET create_calendar = ? WHERE id = 1", ('mariia',))
+        await db.commit()
+
+    keyboard = await kb.show_schedule_month_btn()
+    await callback.message.edit_text('Календарь для Марии', reply_markup=keyboard)
+    await callback.answer()
+
+
+@router.callback_query(F.data.startswith('month'))
 async def press_month(callback_query: CallbackQuery):
     number_month = int(callback_query.data.replace('month', ''))
 
@@ -182,3 +193,28 @@ async def press_month(callback_query: CallbackQuery):
 
     await callback_query.answer()
 
+
+@router.callback_query(F.data.startswith('show_app_'))
+async def press_month(callback_query: CallbackQuery):
+    name_app = str(callback_query.data.replace('show_app_', ''))
+
+    if name_app == 'tbot':
+        keyboard = await kb.show_app_tbot_update()
+    else:
+        print(name_app)
+
+    await callback_query.answer()
+
+
+@router.callback_query(F.data == "show_app_tbot_update")
+async def show_app_tbot_update_btn(callback: CallbackQuery):
+    await callback.message.answer("🔄 Начинаю обновление бота...")
+
+    result = subprocess.run(
+        ["/mnt/ssd2/hillel_pro/tbot/terminal/update.sh"],
+        capture_output=True,
+        text=True
+    )
+    await callback.message.answer(f"✅ Обновление завершено!")
+    # Закрываем инлайн-уведомление (чтобы не висело)
+    await callback.answer()

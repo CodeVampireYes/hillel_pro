@@ -6,6 +6,7 @@ async def show_start_btn():
     keyboard = InlineKeyboardBuilder()
     keyboard.add(InlineKeyboardButton(text='🖥️ Pi5', callback_data="show_pi5"))
     keyboard.add(InlineKeyboardButton(text='🗄️ DB', callback_data="show_db"))
+    keyboard.add(InlineKeyboardButton(text=' App', callback_data="show_app"))
     keyboard.add(InlineKeyboardButton(text='📅 График', callback_data="show_schedule"))
     return keyboard.adjust(1).as_markup()
 
@@ -65,3 +66,18 @@ async def show_schedule_month_btn():
         num_month += 1
     return keyboard.adjust(2).as_markup()
 
+
+async def show_app_btn():
+    my_app = ['tbot']
+    keyboard = InlineKeyboardBuilder()
+    for app in my_app:
+        keyboard.add(InlineKeyboardButton(text=app, callback_data=f"show_app_{app}"))
+
+    return keyboard.adjust(1).as_markup()
+
+
+async def show_app_tbot_update():
+    keyboard = InlineKeyboardBuilder()
+    keyboard.add(InlineKeyboardButton(text='Update', callback_data=f"show_app_tbot_update"))
+
+    return keyboard.adjust(1).as_markup()
