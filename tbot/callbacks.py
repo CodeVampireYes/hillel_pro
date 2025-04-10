@@ -41,7 +41,12 @@ async def show_db_setting_tbot(callback: CallbackQuery):
             data = await cursor.fetchall()
         await db.commit()
 
-    await callback.message.edit_text('Setting bot', reply_markup=data)
+    await callback.message.edit_text(f"""
+        id: {data[0]}
+        token: {data[1]}
+        create_calendar: {data[2]}
+        
+        """)
     await callback.answer()
 
 
