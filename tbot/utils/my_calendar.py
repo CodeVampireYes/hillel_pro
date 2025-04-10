@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 import calendar
 import matplotlib.pyplot as plt
+import aiosqlite
 
 
 # Рабочие дни и выходные для Артура
@@ -35,7 +36,7 @@ grafik_artur()
 
 
 def grafik_mariia():
-    start_date = date(2025, 2, 9)
+    start_date = date(2025, 2, 11)
 
     current_date = start_date
 
@@ -51,14 +52,22 @@ def grafik_mariia():
 
 grafik_mariia()
 
-async def generate_calendar(number_month, username_calendar):
 
-    if username_calendar == 'artur':
-        list_weekend = work_calendar_artur
-        who = 'Artur'
-    else:
-        list_weekend = calendar_mariia
-        who = 'Mariia'
+async def generate_calendar(number_month):
+    async with aiosqlite.connect('example.db') as db:
+        async with db.execute("SELECT create_calendar FROM setting_tbot") as cursor:
+            username_calendar = await cursor.fetchone()
+            print(username_calendar)
+        await db.commit()
+
+        if username_calendar[0] == 'artur':
+            print('artur')
+            list_weekend = work_calendar_artur
+            who = 'Artur'
+        elif username_calendar[0] == 'mariia':
+            print('mariia')
+            list_weekend = work_calendar_mariia
+            who = 'Mariia'
 
     year = 2025  # Можно заменить на текущий год
     cal = calendar.monthcalendar(year, number_month)
