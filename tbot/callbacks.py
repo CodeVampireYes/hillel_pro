@@ -1,9 +1,10 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile
 from db import get_token_setting_tbot
 
 import keyboards as kb
 from utils import pi5
+from utils.my_calendar import generate_calendar
 
 import aiosqlite
 import subprocess
@@ -124,7 +125,46 @@ async def show_pi5_metrics_btn(callback: CallbackQuery):
 
 
 @router.callback_query(F.data == "show_schedule")
-async def show_pi5_metrics_btn(callback: CallbackQuery):
+async def show_schedule_btn(callback: CallbackQuery):
     keyboard = await kb.show_schedule_btn()
     await callback.message.edit_text('График для:', reply_markup=keyboard)
     await callback.answer()
+
+
+@router.callback_query(F.data == "show_schedule_mariia")
+async def show_schedule_mariia_btn(callback: CallbackQuery):
+    async with aiosqlite.connect('example.db') as db:
+        await db.execute("UPDATE setting_tbot SET create_calendar = ? WHERE id = 1", ('mariia',))
+        await db.commit()
+
+    keyboard = await kb.show_schedule_month_btn()
+    await callback.message.edit_text('Календарь для Марии', reply_markup=keyboard)
+    await callback.answer()
+
+
+@router.callback_query(F.data == "show_schedule_artur")
+async def show_schedule_artur_btn(callback: CallbackQuery):
+    async with aiosqlite.connect('example.db') as db:
+        await db.execute("UPDATE setting_tbot SET create_calendar = ? WHERE id = 1", ('artur',))
+        await db.commit()
+
+    keyboard = await kb.show_schedule_month_btn()
+    await callback.message.edit_text('Календарь для Артура', reply_markup=keyboard)
+    await callback.answer()
+
+
+@router.callback_query(F.data.startswith('month'))
+async def press_month(callback_query: CallbackQuery):
+    number_month = int(callback_query.data.replace('month', ''))
+    async with aiosqlite.connect('example.db') as db:
+        async with db.execute("SELECT create_calendar FROM setting_tbot") as cursor:
+            username_calendar = await cursor.fetchone()
+        await db.commit()
+
+    # Используем await для генерации календаря
+    filename = await generate_calendar(number_month, username_calendar)
+
+    photo = FSInputFile(filename)
+    await callback_query.message.answer_photo(photo)
+
+    await callback_query.answer()

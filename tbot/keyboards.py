@@ -52,5 +52,16 @@ async def show_schedule_btn():
     keyboard.add(InlineKeyboardButton(text='Артур', callback_data="show_schedule_artur"))
     keyboard.add(InlineKeyboardButton(text='Совместные', callback_data="show_schedule_together"))
     keyboard.add(InlineKeyboardButton(text='🔙 Back', callback_data="back_show_menu"))
+    return keyboard.adjust(1).as_markup()
 
+
+async def show_schedule_month_btn():
+    year = ['январь', "февраль", 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь',
+            'Декабрь']
+    num_month = 1
+    keyboard = InlineKeyboardBuilder()
+    for month in year:
+        keyboard.add(InlineKeyboardButton(text=month, callback_data=f'month{num_month}'))
+        num_month += 1
+    return keyboard.adjust(2).as_markup()
 

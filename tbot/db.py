@@ -1,5 +1,4 @@
 import aiosqlite
-import asyncio
 
 
 async def init_db_setting_tbot():
@@ -8,7 +7,8 @@ async def init_db_setting_tbot():
         await db.execute("""
             CREATE TABLE IF NOT EXISTS setting_tbot (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                token TEXT NOT NULL
+                token TEXT NOT NULL,
+                create_calendar TEXT
             )
         """)
         await db.commit()
