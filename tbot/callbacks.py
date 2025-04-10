@@ -34,6 +34,17 @@ async def callback_show_menu_btn(callback: CallbackQuery):
     await callback.answer()
 
 
+@router.callback_query(F.data == "show_db_setting_tbot")
+async def show_db_setting_tbot(callback: CallbackQuery):
+    async with aiosqlite.connect('example.db') as db:
+        async with db.execute("SELECT * FROM setting_tbot") as cursor:
+            data = await cursor.fetchall()
+        await db.commit()
+
+    await callback.message.edit_text('Setting bot', reply_markup=data)
+    await callback.answer()
+
+
 @router.callback_query(F.data == "show_db_users_username")
 async def callback_show_db_users_btn(callback: CallbackQuery):
     async with aiosqlite.connect('example.db') as db:
