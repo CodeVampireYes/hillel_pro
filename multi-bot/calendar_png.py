@@ -1,8 +1,6 @@
 import calendar
-import asyncio
 import matplotlib.pyplot as plt
 from my_calendar import work_calendar_artur, work_calendar_mariia
-from datetime import datetime
 from database import db  # Импортируем асинхронную БД
 
 

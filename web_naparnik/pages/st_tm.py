@@ -15,7 +15,9 @@ st.markdown("""
 
 
 def main():
-    st.page_link('app.py', label='TM-ST')
+    with st.sidebar:
+        pass
+
     input_buy_st, min_sell = input_section()
     add_item_in_db(input_buy_st, min_sell)
     st.markdown("---")

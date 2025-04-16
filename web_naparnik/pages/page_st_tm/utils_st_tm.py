@@ -1,5 +1,6 @@
 import streamlit as st
 from pages.page_st_tm.db import *
+from pages.page_st_tm.parse_price import *
 
 
 def input_section():
@@ -7,7 +8,7 @@ def input_section():
     with cols[0]:
         st.text(' ')
     with cols[1]:
-        st.header("ST-TM")
+        st.header("ST-TM", help=None)
     with cols[2]:
         st.text(' ')
 
@@ -31,14 +32,14 @@ def input_section():
 
 
 def add_item_in_db(input_buy_st: float, min_sell: float):
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4 = st.columns([5.2, 1, 1, 1])
 
     with col1:
         name = st.text_input('Item Name', key='item_name')
     with col2:
         st.text_input('Min Sell ST', value=f"{min_sell:.2f}", disabled=True)
     with col3:
-        if st.button('Add to Database', disabled=not name):
+        if st.button('Add', disabled=not name):
             add_item_st_tm(name, input_buy_st, min_sell)
     with col4:
         pass
@@ -96,17 +97,19 @@ def item_section_db():
     # Display totals
     cols = st.columns(6)
     with cols[0]:
-        st.metric("Total Buy ZL", f"{totals['buy_st'] * 4:.2f}")
+        st.metric("Total Buy USDT", f"{totals['buy_st'] / 4:.2f}")
     with cols[1]:
-        st.metric("Total Buy USDT", f"{totals['buy_st']:.2f}")
+        st.metric("Total Buy ZL", f"{totals['buy_st']:.2f}")
     with cols[4]:
         st.metric("Total Profit", f"{totals['profit']:.2f}")
     with cols[5]:
         st.metric("Total Percent", f"{totals['percent']:.1f}%")
 
     # Display items in a table-like format
+    total_maybe_sell = 0
     for item in items:
-        cols = st.columns([0.5, 3, 1, 1, 1, 1, 1, 1])
+
+        cols = st.columns([0.5, 3, 1, 1, 1, 1, 1, 1, 1])
 
         with cols[0]:
             st.text_input('ID', value=item[0], key=f'id_{item[0]}', disabled=True)
@@ -121,7 +124,7 @@ def item_section_db():
             st.text_input('Min Sell', value=f"{item[3]:.2f}", key=f"min_{item[0]}", disabled=True)
 
         with cols[4]:
-            new_sell = st.text_input('Actual Sell', value=f"{item[4] if item[4] else ''}", key=f"sell_{item[0]}")
+            new_sell = st.text_input('Sell', value=f"{item[4] if item[4] else ''}", key=f"sell_{item[0]}")
 
         with cols[5]:
             if item[4]:
@@ -145,3 +148,9 @@ def item_section_db():
                     st.rerun()
                 except ValueError:
                     st.error("Please enter a valid number")
+        with cols[8]:
+            st.text_input('Price TM', value=search_item_price(item[1]), key=f"price_tm_{item[0]}")
+            total_maybe_sell += float(search_item_price(item[1]))
+
+    st.markdown("---")
+    st.text_input(label='Maybe Sell', value=f'{total_maybe_sell:.3f}')

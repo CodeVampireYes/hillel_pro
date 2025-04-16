@@ -151,7 +151,7 @@ def input_section():
 
 
 def add_item_section(buy_tm: float, min_sell: float):
-    col1, col2, col3, col4 = st.columns([2, 1, 1, 2])
+    col1, col2, col3, col4 = st.columns([5.2, 1, 1, 1])
 
     with col1:
         name = st.text_input('Item Name', key='item_name')
@@ -160,7 +160,7 @@ def add_item_section(buy_tm: float, min_sell: float):
         st.text_input('Min Sell ST', value=f"{min_sell:.2f}", disabled=True)
 
     with col3:
-        if st.button('Add to Database', disabled=not name):
+        if st.button('Add', disabled=not name):
             add_item_tm_st(name, buy_tm, min_sell)
     with col4:
         st.text(' ')
@@ -184,7 +184,7 @@ def display_items_section():
 
     # Display items in a table-like format
     for item in items:
-        cols = st.columns([0.5, 3, 1, 1, 1, 1, 1, 1])
+        cols = st.columns([0.5, 3.3, 0.8, 0.8, 0.8, 0.8, 0.8, 1])
 
         with cols[0]:
             st.text_input('ID', value=item[0], key=f'id_{item[0]}', disabled=True)
@@ -199,7 +199,7 @@ def display_items_section():
             st.text_input('Min Sell', value=f"{item[3]:.2f}", key=f"min_{item[0]}", disabled=True)
 
         with cols[4]:
-            new_sell = st.text_input('Actual Sell', value=f"{item[4] if item[4] else ''}", key=f"sell_{item[0]}")
+            new_sell = st.text_input('Sell', value=f"{item[4] if item[4] else ''}", key=f"sell_{item[0]}")
 
         with cols[5]:
             if item[4]:
@@ -227,7 +227,9 @@ def display_items_section():
 
 # Main App
 def main():
-    st.page_link('pages/st_tm.py', label='ST-TM')
+    with st.sidebar:
+        pass
+
     create_tables()
 
     buy_tm, min_sell = input_section()
