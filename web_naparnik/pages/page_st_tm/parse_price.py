@@ -32,6 +32,7 @@ def get_price_tm(item: str):
 all_item = []
 
 def get_items_list():
+
     url = f'https://market.csgo.com/api/v2/prices/USD.json?key={API_TM}'  # этот эндпоинт отдаёт список предметов
     response = requests.get(url)
 
@@ -57,5 +58,3 @@ def search_item_price(item: str):
     for el in all_item:
         if el[0] == item:
             return el[1]
-
-

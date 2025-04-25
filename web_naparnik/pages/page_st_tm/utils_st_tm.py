@@ -101,7 +101,7 @@ def item_section_db():
     with cols[1]:
         st.metric("Total Buy ZL", f"{totals['buy_st']:.2f}")
     with cols[4]:
-        st.metric("Total Profit", f"{totals['profit']:.2f}")
+        st.metric("Total Profit", f"{totals['profit']:.3f}")
     with cols[5]:
         st.metric("Total Percent", f"{totals['percent']:.1f}%")
 
